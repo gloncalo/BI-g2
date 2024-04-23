@@ -1,0 +1,38 @@
+## Vendas Mensais ao Longo do Tempo --------------------------------------------
+
+# Carregar pacotes necessários
+library(ggplot2)
+library(dplyr)
+library(lubridate)  # Para manipulação de datas
+
+# Converter OrderDate para formato de data
+factSales$OrderDate <- as.Date(as.character(factSales$OrderDate))
+
+# Calcular vendas mensais
+vendas_mensais <- factSales %>%
+    mutate(YearMonth = format(OrderDate, "%Y-%m")) %>%
+    group_by(YearMonth) %>%
+    summarise(Vendas = sum(SalesAmount))
+
+# Extrair o ano de YearMonth
+vendas_mensais$Ano <- year(as.Date(paste0(vendas_mensais$YearMonth, "-01")))
+
+# Criar o gráfico de barras
+grafico_barras <- ggplot(vendas_mensais, aes(x = YearMonth, y = Vendas, fill = factor(Ano))) +
+    geom_bar(stat = "identity") +
+    labs(
+        title = "Vendas Mensais ao Longo do Tempo",
+        x = "Mês",
+        y = "Vendas",
+        caption = "Fonte: Dados de Vendas"
+    ) +
+    scale_fill_manual(values = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
+                      name = "Ano",
+                      labels = unique(vendas_mensais$Ano)) +
+    theme_minimal() +
+    theme(
+        axis.text.x = element_text(angle = 45, hjust = 1)  # Rotacionar os rótulos do eixo x para melhor legibilidade
+    )
+
+# Mostrar o gráfico
+print(grafico_barras)
