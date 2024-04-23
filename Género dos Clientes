@@ -1,0 +1,31 @@
+## Género dos Clientes --------
+
+# Carregar os pacotes necessários
+library(tidyverse)
+
+# Carregar os dados
+customers <- customers
+
+# Calcular o número de clientes por gênero
+gender_counts <- customers %>%
+    mutate(Gender = case_when(
+        Gender == "F" ~ "Feminino",
+        Gender == "M" ~ "Masculino",
+        TRUE ~ Gender
+    )) %>%
+    count(Gender)
+
+# Criar uma paleta de cores em tons de azul
+blue_palette <- scales::brewer_pal(palette = "Blues")(length(gender_counts$Gender))
+
+# Criar o gráfico de pizza (pizza chart)
+ggplot(gender_counts, aes(x = "", y = n, fill = Gender)) +
+    geom_bar(stat = "identity", width = 1) +
+    coord_polar("y", start = 0) +
+    geom_text(aes(label = paste0(Gender, "\n", n)), position = position_stack(vjust = 0.5), color = "black", size = 4) +
+    scale_fill_manual(values = blue_palette) +
+    labs(title = "Distribuição de Gênero dos Clientes",
+         fill = "Gênero",
+         x = NULL, y = NULL) +
+    theme_void() +
+    theme(legend.position = "right")
