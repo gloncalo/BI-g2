@@ -1,0 +1,12 @@
+ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(TotalSales)), y = TotalSales / 1000000)) +  
+    geom_segment(aes(xend = Country, yend = 0), color = "skyblue") +  # Adiciona segmentos verticais
+    geom_point(color = "skyblue", size = 3) +  # Adiciona pontos na extremidade dos segmentos
+    geom_text(aes(label = paste0(scales::comma(TotalSales / 1000000), "M USD")), vjust = -0.5, size = 3) +  
+    labs(title = "Vendas por País entre 01/07/2016 e 31/07/2019",
+         x = "País",
+         y = "Total de Vendas (Milhões USD)") +
+    scale_y_continuous(labels = comma) +  # Formatação de milhares no eixo y
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title = element_text(size = 10),  # Tamanho da fonte do título do eixo x e do eixo y
+          plot.title = element_text(size = 12))  # Tamanho da fonte do título do gráfico
