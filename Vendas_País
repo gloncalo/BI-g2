@@ -1,0 +1,30 @@
+# Carregar os pacotes necessários
+library(tidyverse)
+library(scales)  # Para a formatação de números
+
+# Carregar os dados
+fact_sales <- factSales
+territorios <- territory
+
+# Mesclar os dados de vendas com os dados de território usando a chave de território
+sales_by_country <- fact_sales %>%
+    left_join(territorios, by = c("SalesTerritoryKey" = "Territory Key")) %>%
+    group_by(Country) %>%
+    summarise(TotalSales = sum(SalesAmount, na.rm = TRUE))
+
+# Reordenar os países por vendas decrescentes
+sales_by_country <- sales_by_country %>%
+    arrange(desc(TotalSales))
+
+# Criar o gráfico de barras com rótulos de valores
+ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(TotalSales)), y = TotalSales, fill = Country)) +
+    geom_bar(stat = "identity") +
+    geom_text(aes(label = paste0(scales::comma(TotalSales), "€")), vjust = -0.5, size = 3) +  # Adiciona rótulos com os valores e €
+    labs(title = "Vendas por País",
+         x = "País",
+         y = "Total de Vendas (€)",
+         fill = NULL) +  # Remove a legenda
+    scale_y_continuous(labels = comma) +  # Formatação de milhares no eixo y
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = "none")  # Remove a legenda
