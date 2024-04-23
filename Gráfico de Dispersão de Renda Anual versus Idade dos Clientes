@@ -1,0 +1,30 @@
+## Gráfico de Dispersão de Renda Anual versus Idade dos Clientes:  ---------
+
+# Calcula a idade dos clientes
+customers$Age <- as.numeric(floor(difftime(Sys.Date(), customers$BirthDate)/365.25))
+
+# Define as faixas etárias por décadas
+customers$Age_Group <- cut(customers$Age, breaks = seq(0, max(customers$Age) + 10, by = 10),
+                           labels = paste(seq(0, max(customers$Age), by = 10),
+                                          seq(9, max(customers$Age) + 9, by = 10), sep = "-"),
+                           include.lowest = TRUE)
+
+# Definir uma paleta de cores
+cores <- c("skyblue", "orange", "green", "pink", "purple", "red", "yellow", "blue", "grey", "black")
+
+# Agrupa os clientes por faixa etária e calcula a média da renda anual para cada grupo
+income_age <- aggregate(YearlyIncome ~ Age_Group, data = customers, FUN = mean)
+
+# Cria o gráfico de barras
+grafico_barras <- ggplot(data = income_age, aes(x = Age_Group, y = YearlyIncome, fill = Age_Group)) +
+    geom_bar(stat = "identity") +  # Barras com altura correspondente à média de renda
+    labs(
+        title = "Média da Renda Anual por Faixa Etária dos Clientes",
+        x = "Faixa Etária (décadas)",
+        y = "Média da Renda Anual"
+    ) +
+    scale_fill_manual(values = cores) +  # Mapeia as cores de acordo com as décadas
+    theme_minimal()
+
+# Mostra o gráfico
+print(grafico_barras)
