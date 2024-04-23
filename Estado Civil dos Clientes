@@ -1,0 +1,26 @@
+## Estado Civil dos Clientes -----------------------------------------------
+
+# Calcular a contagem de clientes para cada estado civil
+contagem_estado_civil <- table(ifelse(customers$MaritalStatus == "M", "Solteiro", "Casado"))
+
+# Calcular as porcentagens
+percentagens <- round(100 * contagem_estado_civil / sum(contagem_estado_civil), 1)
+
+# Criar o rótulo para cada fatia da pizza com a porcentagem e o estado civil
+labels <- paste(names(contagem_estado_civil), "\n", percentagens, "%", sep = "")
+
+# Criar o gráfico de pizza
+grafico_pizza <- ggplot(data = NULL, aes(x = "", y = contagem_estado_civil, fill = names(contagem_estado_civil))) +
+    geom_bar(stat = "identity", width = 1) +  # Gráfico de pizza usando barras
+    coord_polar(theta = "y") +  # Coordenação polar para transformar em gráfico de pizza
+    labs(
+        title = "Distribuição do Estado Civil dos Clientes",
+        fill = "Estado Civil",
+        x = NULL,
+        y = NULL
+    ) +
+    theme_void() +  # Remove elementos de grade e eixos
+    geom_text(aes(label = labels), position = position_stack(vjust = 0.5))  # Adiciona rótulos com porcentagens
+
+# Mostrar o gráfico
+print(grafico_pizza)
