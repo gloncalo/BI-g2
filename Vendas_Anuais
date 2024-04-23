@@ -1,0 +1,19 @@
+Vendas anuais ------------------------------------------------------------------
+
+# Ajustar o tamanho da figura
+options(repr.plot.width = 10, repr.plot.height = 10)
+
+# Extrair o ano do OrderDate
+factSales$Year <- format(factSales$OrderDate, "%Y")
+
+# Agregar os dados de vendas por ano
+yearly_sales <- aggregate(SalesAmount ~ Year, data = factSales, sum)
+
+# Criar o gráfico circular
+pie(yearly_sales$SalesAmount,
+    labels = paste(yearly_sales$Year, "\n", "$", round(yearly_sales$SalesAmount / 1000, 1), "k", sep = ""),
+    main = "Vendas Anuais",
+    col = rainbow(length(yearly_sales$Year)),  # Cores diferentes para cada ano
+    cex = 1,  # Tamanho padrão dos rótulos
+    font = 2)  # Negrito para os rótulos
+#
