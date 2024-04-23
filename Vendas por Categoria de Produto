@@ -1,0 +1,35 @@
+## Vendas por Categoria de Produto -----------------------------------------
+
+# Carregar o pacote ggplot2
+library(ggplot2)
+
+# Dados de exemplo (vendas por categoria de produto)
+vendas_por_categoria <- data.frame(
+    Categoria = c("Bicicletas", "Componentes", "Roupa", "Acessórios"),
+    Vendas = c(250000, 180000, 120000, 150000)
+)
+
+# Calcular proporções das vendas
+vendas_por_categoria$Proporcao <- vendas_por_categoria$Vendas / sum(vendas_por_categoria$Vendas)
+
+# Criar o gráfico de pizza
+grafico_pizza <- ggplot(vendas_por_categoria, aes(x = "", y = Proporcao, fill = Categoria)) +
+    geom_bar(stat = "identity", width = 1) +
+    coord_polar(theta = "y") +  # Coordenadas polares para criar um gráfico de pizza
+    labs(
+        title = "Vendas por Categoria de Produto",
+        x = NULL,
+        y = NULL,
+        fill = "Categoria"
+    ) +
+    geom_text(aes(label = paste0(Vendas, "\n", Categoria), fontface = "bold"),
+              position = position_stack(vjust = 0.5),
+              color = "white", size = 4) +  # Adicionar rótulos com valores das vendas e negrito
+    theme_void() +  # Remove elementos de grade e rótulos
+    theme(
+        plot.title = element_text(family = "Arial", size = 18, hjust = 0.5),  # Define a fonte e o tamanho do título
+        text = element_text(family = "Arial", size = 12)  # Define a fonte e o tamanho do texto
+    )
+
+# Mostrar o gráfico
+print(grafico_pizza)
