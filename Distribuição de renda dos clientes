@@ -1,0 +1,14 @@
+## Distribuição de renda dos clientes ---------------------------------------------------------
+
+# Carregar os dados
+clientes <- customers
+
+# Criar o gráfico de violino da distribuição de renda
+ggplot(clientes, aes(x = "", y = YearlyIncome, fill = ..x..)) +
+  geom_violin(trim = FALSE) +
+  scale_fill_gradient(low = "skyblue", high = "blue") +
+  labs(title = "Distribuição de Rendimentos dos Clientes",
+       x = NULL,
+       y = "Renda Anual") +
+  theme_minimal() +
+  theme(legend.position="none")
