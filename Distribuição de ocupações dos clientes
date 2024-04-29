@@ -1,20 +1,10 @@
-## Distribuição de ocupações dos clientes  ------------------------------------
-
-# Carregar os pacotes necessários
-library(tidyverse)
-
-# Carregar os dados
 clientes <- customers
-
-# Calcular contagem de cada ocupação e ordenar as barras por contagem decrescente
 ocupacao_counts <- clientes %>%
     count(Occupation) %>%
     arrange(desc(n))
-
-# Criar o gráfico de barras da distribuição das ocupações dos clientes
 ggplot(ocupacao_counts, aes(x = reorder(Occupation, n), y = n)) +
     geom_bar(stat = "identity", fill = "skyblue", color = "black") +
-    geom_text(aes(label = n), vjust = -0.5, size = 3, color = "black") +  # Adicionar rótulos com contagens
+    geom_text(aes(label = n), vjust = -0.5, size = 3, color = "black") +
     labs(title = "Distribuição das Ocupações dos Clientes",
          x = "Ocupação",
          y = "Número de Clientes") +
