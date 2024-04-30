@@ -1,0 +1,39 @@
+Olá amigo, tenho um data.frame em R que tem vários dados sobre uma empresa. 
+
+facts_dims <- factSales |>
+    merge(calendar, by.x = "OrderDate", by.y = "Date") |>
+    merge(customers, by = "CustomerKey") |>
+    merge(territory, by.x = "SalesTerritoryKey", 
+          by.y = "Territory Key") |>
+    merge(products, by = "ProductKey")
+
+
+[1] "ProductKey"            "SalesTerritoryKey"    
+ [3] "CustomerKey"           "OrderDate"            
+ [5] "OrderDateKey"          "SalesOrderNumber"     
+ [7] "SalesOrderLineNumber"  "OrderQuantity"        
+ [9] "UnitPrice"             "ProductStandardCost"  
+[11] "SalesAmount"           "TaxAmt"               
+[13] "Freight"               "RegionMonthID"        
+[15] "Year"                  "ID"                   
+[17] "DayNumberOfWeek"       "DayName"              
+[19] "MonthName"             "MonthNumberOfYear"    
+[21] "DayNumberOfYear"       "WeekNumberOfYear"     
+[23] "CalendarQuarter"       "CalendarYear"         
+[25] "DayNumberOfMonth"      "GeographyKey"         
+[27] "Name"                  "BirthDate"            
+[29] "MaritalStatus"         "Gender"               
+[31] "YearlyIncome"          "NumberChildrenAtHome" 
+[33] "Occupation"            "HouseOwnerFlag"       
+[35] "NumberCarsOwned"       "AddressLine"          
+[37] "Phone"                 "DateFirstPurchase"    
+[39] "Region"                "Country"              
+[41] "Group"                 "ProductSubCategoryKey"
+[43] "ProductName"           "StandardCost"         
+[45] "Color"                 "SafetyStockLevel"     
+[47] "ListPrice"             "Size"                 
+[49] "DaysToManufacture"     "DealerPrice"          
+[51] "Class"                 "ModelName"            
+[53] "Description"           "Status"               
+[55] "SubCategory"           "Category"             
+[57] "StartDate"             "EndDate"  
