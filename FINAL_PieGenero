@@ -1,0 +1,9 @@
+numero_clientes_masculinos <- sum(grepl("M", facts_dims$Gender))
+numero_clientes_femininos <- sum(grepl("F", facts_dims$Gender))
+percentual_masculino <- round((numero_clientes_masculinos / sum(c(numero_clientes_masculinos, numero_clientes_femininos))) * 100, 1)
+percentual_feminino <- round((numero_clientes_femininos / sum(c(numero_clientes_masculinos, numero_clientes_femininos))) * 100, 1)
+pie(c(numero_clientes_masculinos, numero_clientes_femininos),
+    labels = c(paste("Masculino", percentual_masculino, "%"), paste("Feminino", percentual_feminino, "%")),
+    col = c("#0080ff", "#f9638f"))  
+legend("topright", legend = c("Masculino", "Feminino"), fill = c("#0080ff", "#f9638f"))
+title(main = "Distribuição de Género dos Clientes")
