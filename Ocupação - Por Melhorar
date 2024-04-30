@@ -1,0 +1,12 @@
+occupation_counts <- table(facts_dims$Occupation)
+occupation_df <- data.frame(Occupation = names(occupation_counts),
+                            Count = as.numeric(occupation_counts))
+occupation_df <- occupation_df[order(-occupation_df$Count), ]
+ggplot(occupation_df, aes(x = Occupation, y = Count)) +
+    geom_segment(aes(x = Occupation, xend = Occupation, y = 0, yend = Count), color = "skyblue") +
+    geom_point(color = "#0080ff", size = 3) +
+    coord_flip() +  # Inverter eixo x e y
+    labs(title = "Distribuição de Ocupação dos Clientes",
+         x = "Ocupação",
+         y = "Contagem") +
+    theme_minimal()
