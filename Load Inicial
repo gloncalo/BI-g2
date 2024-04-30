@@ -1,0 +1,35 @@
+# Packages ----------------------------------------------------------------
+
+# bibliotecas --- modificar sempre que acrescentar uma biblioteca
+bibliotecas <- c("knitr", "rmdformats", "lubridate", "ggplot2","dplyr", "DT", "gt",
+                 "flextable", "plotly", "gganimate")
+for (bibl in bibliotecas) {
+    if (bibl %in% rownames(installed.packages()) == FALSE){
+        install.packages(bibl, dependencies = TRUE)
+        library(bibl, character.only = TRUE)
+    }
+    else {
+        library(bibl, character.only = TRUE)
+    }
+}
+
+rm(bibl, bibliotecas)
+
+
+# Loading Data ------------------------------------------------------------
+
+data_files <- c("calendar.Rda", "customers.Rda", "productCategory.Rda",
+                "products.Rda", "productSubCategory.Rda","territory.Rda",
+                "factSales.Rda")
+load(data_files)
+
+#Base Version 2
+facts_dims <- factSales |>
+    merge(calendar, by.x = "OrderDate", by.y = "Date") |>
+    merge(customers, by = "CustomerKey") |>
+    merge(territory, by.x = "SalesTerritoryKey", 
+          by.y = "Territory Key") |>
+    merge(products, by = "ProductKey")
+
+save(facts_dims, file = "facts_dims.Rda")
+load("facts_dims.Rda")
