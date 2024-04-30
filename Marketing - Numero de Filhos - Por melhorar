@@ -1,0 +1,11 @@
+children_counts <- table(facts_dims$NumberChildrenAtHome)
+children_df <- data.frame(ChildrenCount = as.integer(names(children_counts)),
+                           Count = as.integer(children_counts))
+children_df <- children_df[order(children_df$ChildrenCount), ]
+ggplot(children_df, aes(x = factor(ChildrenCount), y = Count)) +
+  geom_segment(aes(x = factor(ChildrenCount), xend = factor(ChildrenCount), y = 0, yend = Count), color = "skyblue") +
+  geom_point(color = "#0080ff", size = 3) +
+  labs(title = "Numero de Filhos por Casa",
+       x = "Numero de Filhos",
+       y = "Numero") +
+  theme_minimal()
