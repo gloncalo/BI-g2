@@ -1,7 +1,9 @@
-ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(TotalSales)), y = TotalSales / 1000000)) +  
+sales_by_country <- aggregate(SalesAmount ~ Country, data = facts_dims, FUN = sum)
+sales_by_country <- sales_by_country[order(sales_by_country$SalesAmount, decreasing = TRUE), ]
+ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(SalesAmount)), y = SalesAmount / 1000000)) +
     geom_segment(aes(xend = Country, yend = 0), color = "skyblue") +  # Adiciona segmentos verticais
     geom_point(color = "skyblue", size = 3) +  # Adiciona pontos na extremidade dos segmentos
-    geom_text(aes(label = paste0(scales::comma(TotalSales / 1000000))), vjust = -0.5, size = 3) +  
+    geom_text(aes(label = paste0(scales::comma(SalesAmount / 1000000))), vjust = -0.5, size = 3) +
     labs(title = "Vendas por País (2016-2019)",
          x = "País",
          y = "Total de Vendas (Milhões USD)") +
