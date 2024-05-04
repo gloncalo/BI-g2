@@ -1,0 +1,15 @@
+library(ggplot2)
+
+vendas_por_ano <- aggregate(SalesAmount ~ CalendarYear, data = fact_dims, sum)
+
+grafico_vendas <- ggplot(vendas_por_ano, aes(x = CalendarYear, y = SalesAmount)) +
+    geom_line(color = "blue") +
+    geom_point(color = "red", size = 3) +
+    geom_text(aes(label = paste0("", round(SalesAmount / 1000000, 2), "")), vjust = -0.5, hjust = -0.2, size = 3) +
+    labs(title = "Evolução de Vendas ao Longo dos Anos",
+         x = "Ano",
+         y = "Vendas Totais (em milhões de Dolars)") +
+    scale_y_continuous(labels = scales::dollar_format(scale = 1e-6)) +
+    theme_minimal()
+
+print(grafico_vendas)
