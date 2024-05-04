@@ -1,16 +1,15 @@
-children_counts <- table(facts_dims$NumberChildrenAtHome)
-children_df <- data.frame(ChildrenCount = as.integer(names(children_counts)),
-                          Count = as.integer(children_counts))
-children_df <- children_df[order(children_df$ChildrenCount), ]
+occupation_counts <- table(facts_dims$Occupation)
+occupation_df <- data.frame(Occupation = names(occupation_counts),
+                            Count = as.numeric(occupation_counts))
+occupation_df <- occupation_df[order(occupation_df$Count), ]
+occupation_df$Count <- round(occupation_df$Count / 1000, 1)
 
-children_df$Count <- round(children_df$Count / 1000, 1)
-
-
-ggplot(children_df, aes(x = factor(ChildrenCount), y = Count)) +
-    geom_segment(aes(x = factor(ChildrenCount), xend = factor(ChildrenCount), y = 0, yend = Count), color = "skyblue") +
+ggplot(occupation_df, aes(x = Occupation, y = Count)) +
+    geom_segment(aes(x = Occupation, xend = Occupation, y = 0, yend = Count), color = "skyblue") +
     geom_point(color = "#0080ff", size = 3) +
-    geom_text(aes(label = Count), vjust = -1, size = 3) +  # Adiciona os valores sobre os traços
-    labs(title = "Número de Filhos por Casa",
-         x = "Número de Filhos",
+    geom_text(aes(label = Count), vjust = -1.5, size = 3) +
+    coord_flip() +  
+    labs(title = "Distribuição de Ocupação dos Clientes",
+         x = "Ocupação",
          y = "Número (em milhares)") +
     theme_minimal()
