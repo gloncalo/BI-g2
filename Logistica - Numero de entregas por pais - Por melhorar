@@ -1,0 +1,25 @@
+library(ggplot2)
+
+sales_with_territory <- merge(fact_dims, territory, by.x = "SalesTerritoryKey", by.y = "Territory Key")
+
+contagem_entregas_pais <- table(sales_with_territory$Country)
+
+df_contagem_entregas_pais <- as.data.frame.table(contagem_entregas_pais)
+
+colnames(df_contagem_entregas_pais) <- c("País", "Número de Entregas")
+
+df_contagem_entregas_pais <- df_contagem_entregas_pais[order(df_contagem_entregas_pais$`Número de Entregas`), ]
+
+grafico_entregas_pais <- ggplot(df_contagem_entregas_pais, aes(x = reorder(País, `Número de Entregas`), y = `Número de Entregas`)) +
+    geom_point(color = "dodgerblue", size = 3) +
+    geom_segment(aes(x = País, xend = País, y = 0, yend = `Número de Entregas`), color = "darkblue") +
+    geom_text(aes(label = `Número de Entregas`), vjust = -0.5, size = 3) +
+    labs(
+        title = "Distribuição de Entregas por País",
+        x = "País",
+        y = "Número de Entregas"
+    ) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(grafico_entregas_pais)
