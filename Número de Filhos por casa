@@ -18,4 +18,3 @@ grafico_lolipop <- ggplot(dados_filhos, aes(x = reorder(factor(NumberChildrenAtH
 # Mostrar o gráfico
 print(grafico_lolipop)
 
-
