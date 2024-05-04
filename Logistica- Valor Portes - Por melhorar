@@ -27,3 +27,5 @@ plot_bubble_chart <- function(data) {
 
 Chamando a função com o conjunto de dados
 plot_bubble_chart(facts_dims)
+
+
