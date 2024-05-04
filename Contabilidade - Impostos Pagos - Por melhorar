@@ -1,23 +1,14 @@
-library(ggplot2)
-library(scales)
-
-# Calcular a soma dos impostos pagos por país
 tax_by_country <- aggregate(TaxAmt ~ Country, data = facts_dims, FUN = sum)
-
-# Converter os valores de impostos para milhões de dólares
-tax_by_country$TaxAmt_million <- tax_by_country$TaxAmt / 1000000
-
-# Criar o gráfico donut
-p <- ggplot(tax_by_country, aes(x = "", y = TaxAmt, fill = Country, label = TaxAmt_million)) +
+tax_by_country$TaxAmt_million <- round(tax_by_country$TaxAmt / 1000, 0)
+ggplot(tax_by_country, aes(x = "", y = TaxAmt, fill = Country, label = TaxAmt_million)) +
     geom_bar(stat = "identity", width = 1) +
-    geom_text(aes(label = paste0(round(TaxAmt_million, 2), "M")), position = position_stack(vjust = 0.5)) +
+    geom_text(aes(label = paste0(round(TaxAmt_million, 2), "")), position = position_stack(vjust = 0.5)) +
     coord_polar(theta = "y") +
     theme_void() +
     theme(legend.position = "right") +
-    scale_fill_brewer(palette = "Set3") +  # Escolher uma paleta de cores
-    ggtitle("Soma dos Impostos por País") +
-    labs(y = "Tax Amount (Millions of dollars)") +  # Atualizar o rótulo do eixo y
-    scale_y_continuous(labels = comma) +  # Formatar os rótulos do eixo y
+    scale_fill_brewer(palette = "Set3") + 
+    ggtitle("Soma dos Impostos por País (em milhares de USD)") +
+    labs(y = "Tax Amount (Millions of dollars)") +  
+    scale_y_continuous(labels = comma) +  
     theme(legend.position = "right")
 
-print(p)
