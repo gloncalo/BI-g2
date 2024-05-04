@@ -1,0 +1,16 @@
+children_counts <- table(facts_dims$NumberChildrenAtHome)
+children_df <- data.frame(ChildrenCount = as.integer(names(children_counts)),
+                          Count = as.integer(children_counts))
+children_df <- children_df[order(children_df$ChildrenCount), ]
+
+children_df$Count <- round(children_df$Count / 1000, 1)
+
+
+ggplot(children_df, aes(x = factor(ChildrenCount), y = Count)) +
+    geom_segment(aes(x = factor(ChildrenCount), xend = factor(ChildrenCount), y = 0, yend = Count), color = "skyblue") +
+    geom_point(color = "#0080ff", size = 3) +
+    geom_text(aes(label = Count), vjust = -1, size = 3) +  # Adiciona os valores sobre os traços
+    labs(title = "Número de Filhos por Casa",
+         x = "Número de Filhos",
+         y = "Número (em milhares)") +
+    theme_minimal()
