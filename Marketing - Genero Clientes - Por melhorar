@@ -7,3 +7,5 @@ pie(c(numero_clientes_masculinos, numero_clientes_femininos),
     col = c("#0080ff", "#f9638f"))  
 legend("topright", legend = c("Masculino", "Feminino"), fill = c("#0080ff", "#f9638f"))
 title(main = "Distribuição de Género dos Clientes")
+
+
