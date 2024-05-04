@@ -1,0 +1,17 @@
+soma_portes_pais <- aggregate(Freight ~ Country, data = fact_dims, sum)
+
+soma_portes_pais$Country <- factor(soma_portes_pais$Country, levels = soma_portes_pais$Country[order(soma_portes_pais$Freight)])
+
+grafico_bolhas <- ggplot(soma_portes_pais, aes(x = Country, y = Freight, size = Freight, label = paste0("$", round(Freight, 2)))) +
+    geom_point(color = "dodgerblue", alpha = 0.7) +
+    geom_text(vjust = -0.5, size = 3) +
+    labs(
+        title = "Total de Portes por País",
+        x = "País",
+        y = "Total de Portes",
+        size = "Total de Portes"
+    ) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(grafico_bolhas)
