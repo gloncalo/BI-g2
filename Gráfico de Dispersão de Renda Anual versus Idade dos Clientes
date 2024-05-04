@@ -1,4 +1,4 @@
-## Gráfico de Dispersão de Renda Anual versus Idade dos Clientes:  ---------
+## Renda Anual versus Idade dos Clientes:  ---------
 
 # Calcula a idade dos clientes
 customers$Age <- as.numeric(floor(difftime(Sys.Date(), customers$BirthDate)/365.25))
