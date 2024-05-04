@@ -10,5 +10,5 @@ ggplot(average_prices, aes(x = reorder(Country, avg_price), y = avg_price)) +
        x = "País",  
        y = "Preço Médio (USD)") +
   annotate("text", x = average_prices$Country, y = average_prices$avg_price + 5,  
-           label = round(average_prices$avg_price, 2), 
+           label = round(average_prices$avg_price, 0), 
            color = "black", size = 3, hjust = -0.2)  
