@@ -1,0 +1,20 @@
+library(ggplot2)
+
+# Calcular as vendas totais por subcategoria de produto
+sales_by_subcategory <- aggregate(SalesAmount ~ ProductSubCategory, data = factSales, sum)
+
+# Ordenar as subcategorias pelo valor de vendas
+sales_by_subcategory <- sales_by_subcategory[order(-sales_by_subcategory$SalesAmount), ]
+
+# Criar o gráfico de barras
+ggplot(sales_by_subcategory, aes(x = reorder(ProductSubCategory, -SalesAmount), y = SalesAmount)) +
+  geom_col(fill = "skyblue") +
+  geom_text(aes(label = paste0("$", round(SalesAmount / 1000000, 2), "M")), vjust = -0.5, size = 3) +
+  labs(title = "Vendas por Subcategoria de Produto",
+       x = "Subcategoria de Produto",
+       y = "Total de Vendas (Milhões USD)") +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title = element_text(size = 10), 
+        plot.title = element_text(size = 12))
