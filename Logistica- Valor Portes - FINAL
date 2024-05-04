@@ -1,0 +1,20 @@
+plot_bubble_chart <- function(data) {
+    soma_portes_pais <- aggregate(Freight ~ Country, data = data, sum)
+    soma_portes_pais$Country <- factor(soma_portes_pais$Country, levels = soma_portes_pais$Country[order(soma_portes_pais$Freight)])
+    soma_portes_pais$Freight <- soma_portes_pais$Freight / 1000
+    
+    grafico_bolhas <- ggplot(soma_portes_pais, aes(x = Country, y = Freight, label = paste0("", format(round(Freight, 0), big.mark = ",")))) +
+        geom_point(color = "dodgerblue", alpha = 0.7) +
+        geom_text(vjust = -0.5, size = 3) +
+        labs(
+            title = "Total de Portes pagos em cada país",
+            x = "País",
+            y = "Total de Portes pagos (em milhares de dólares)",
+        ) +
+        theme_minimal() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    print(grafico_bolhas)
+}
+
+plot_bubble_chart(facts_dims)
+
