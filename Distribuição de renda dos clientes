@@ -12,3 +12,5 @@ ggplot(clientes, aes(x = "", y = YearlyIncome, fill = ..x..)) +
        y = "Renda Anual") +
   theme_minimal() +
   theme(legend.position="none")
+
+
