@@ -1,0 +1,27 @@
+subproduct_counts_aggregated <- subproduct_counts %>%
+  mutate(SubCategory = ifelse(SubCategory %in% c("Vests", "Jerseys", "Shorts", "Socks"), "Combined", SubCategory)) %>%
+  group_by(SubCategory) %>%
+  summarize(Unique_Products = sum(Unique_Products))
+ggplot(subproduct_counts_aggregated, aes(x = reorder(SubCategory, Unique_Products), y = Unique_Products, fill = SubCategory)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Unique_Products), hjust = -0.2, size = 3, color = "black") + 
+  labs(title = "Unique Products by SubCategory",
+       x = "SubCategory",
+       y = "Unique Products") +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 8), legend.position = "none") +
+  coord_flip()
+
+
+ou 
+
+
+
+ggplot(subproduct_counts, aes(x = reorder(SubCategory, Unique_Products), y = Unique_Products, fill = SubCategory)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Unique Products by SubCategory",
+       x = "SubCategory",
+       y = "Unique Products") +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 8), legend.position = "none") +
+  coord_flip()
