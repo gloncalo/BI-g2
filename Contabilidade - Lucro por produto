@@ -1,0 +1,14 @@
+# Sort the data by Total Profit
+product_summary <- product_summary %>% 
+  arrange(desc(Total_Profit))
+
+# Create lollipop chart
+ggplot(product_summary, aes(x = reorder(ProductKey, Total_Profit), y = Total_Profit)) +
+  geom_segment(aes(xend = reorder(ProductKey, Total_Profit), yend = 0), color = "#2E86C1", size = 1.5) +  # Add segments (sticks)
+  geom_point(color = "#E74C3C", size = 3) +  # Add points (circles)
+  coord_flip() +  # Flip the coordinates to make it horizontal
+  labs(title = "Total Profit by Product",
+       x = "Product",
+       y = "Total Profit") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
