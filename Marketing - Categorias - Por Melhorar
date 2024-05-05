@@ -1,12 +1,12 @@
-product_counts <- fact_dims %>%
-  group_by(Category) %>%
-  summarize(Unique_Products = n_distinct(ProductKey))
+product_counts <- product_counts %>%
+    mutate(Percentage = round(Unique_Products / sum(Unique_Products) * 100, 1))
 ggplot(product_counts, aes(x = "", y = Unique_Products, fill = Category)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y", start = 0) +
-  labs(title = "Categorias dos Produtos",
-       fill = "Categorias",
-       x = NULL,
-       y = NULL) +
-  theme_void() +
-  theme(legend.position = "right")
+    geom_bar(stat = "identity", width = 1) +
+    coord_polar("y", start = 0) +
+    geom_text(aes(label = paste0(Percentage, "%")), size = 2.5,  position = position_stack(vjust = 0.5)) + #
+    labs(title = "Produtos por Categoria",
+         fill = "Categoria",
+         x = NULL,
+         y = NULL) +
+    theme_void() +
+    theme(legend.position = "right")
