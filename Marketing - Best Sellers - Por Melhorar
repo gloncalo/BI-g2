@@ -1,0 +1,19 @@
+sales_summary <- fact_dims %>%
+  group_by(ProductName) %>%
+  summarize(Num_Sales = n())
+sales_summary <- sales_summary %>%
+  arrange(desc(Num_Sales))
+top_bottom_summary <- bind_rows(
+  head(sales_summary, 5),
+  tail(sales_summary, 5)
+)
+ggplot(top_bottom_summary, aes(x = reorder(ProductName, Num_Sales), y = Num_Sales)) +
+  geom_segment(aes(xend = reorder(ProductName, Num_Sales), yend = 0), color = "#2E86C1", size = 1.5) + 
+  geom_point(color = "#E74C3C", size = 3) +  # Add points (circles)
+  geom_text(aes(label = Num_Sales), vjust = -0.5, color = "black", size = 3.5) +  
+  coord_flip() +  # Flip the coordinates to make it horizontal
+  labs(title = "Produtos Mais e Menos Vendidos",
+       x = "Producto",
+       y = "Unidades Vendidas") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))  
