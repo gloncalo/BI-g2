@@ -1,0 +1,445 @@
+---
+title: "Relatório BI"
+date: "`r Sys.Date()`"
+author: 20211143, 20211139, 20211131, 20211115, 20181082
+output:
+  rmdformats::robobook:
+    code_folding: show
+    toc: 3
+    thumbnails: false
+    lightbox: true
+    gallery: false
+    cache: false
+    highlight: kate
+    fig_width: 3
+    fig_height: 2
+---
+
+```{r config, include=FALSE}
+# bibliotecas --- modificar sempre que acrescentar uma biblioteca
+bibliotecas <- c("knitr", "rmdformats", "lubridate", "ggplot2","dplyr", "DT", "gt",
+                 "flextable", "plotly", "gganimate")
+for (bibl in bibliotecas) {
+        library(bibl, character.only = TRUE)
+}
+rm(bibl, bibliotecas)
+
+# knit: opções globais --- não modificar!
+options(max.print="80")
+opts_chunk$set(echo=FALSE,
+	           cache=FALSE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=TRUE)
+opts_knit$set(width=80)
+```
+
+## Autores
+
+-   Turma: T61
+-   Grupo: G02/T61
+-   Autores
+    -   20181082 Gonçalo Colaço
+    -   20211143 Inês Bento
+    -   20211131 Miguel Morgado
+    -   20211139 Patrícia Ruivo
+    -   20211115 Samuel Olo
+  
+
+## Introdução
+
+Os dados da empresa são relativos ao período entre 01-07-2016 e 31-07-2019. O tipo de produtos que  empresa vende, o custo dos produtos, custo de envio, os produtos mais vendidos, entre outros detalhes. 
+
+```{r data_loading, include=FALSE}
+data_files <- c("calendar.Rda", "customers.Rda", "productCategory.Rda",
+                "products.Rda", "productSubCategory.Rda", "territory.Rda",
+                "factSales.Rda", "facts_dims.Rda")
+
+for (dfiles in data_files) {
+    load(dfiles)
+    }
+rm(dfiles, data_files)
+
+```
+
+
+## Marketing
+
+### Perfil dos Clientes
+
+```{r fig.height=5, fig.width=7}
+occupation_counts <- table(facts_dims$Occupation)
+occupation_df <- data.frame(Occupation = names(occupation_counts),
+                            Count = as.numeric(occupation_counts))
+occupation_df <- occupation_df[order(occupation_df$Count), ]
+occupation_df$Count <- round(occupation_df$Count / 1000, 1)
+
+ggplot(occupation_df, aes(x = Occupation, y = Count)) +
+    geom_segment(aes(x = Occupation, xend = Occupation, y = 0, yend = Count), color = "skyblue") +
+    geom_point(color = "#0080ff", size = 3) +
+    geom_text(aes(label = Count), vjust = -1.5, size = 3) +
+    coord_flip() +  
+    labs(title = "Distribuição de Ocupação dos Clientes",
+         x = "Ocupação",
+         y = "Número (em milhares)") +
+    theme_minimal()
+
+```
+
+```{r fig.height=5, fig.width=7}
+numero_clientes_masculinos <- sum(grepl("M", facts_dims$Gender))
+numero_clientes_femininos <- sum(grepl("F", facts_dims$Gender))
+percentual_masculino <- round((numero_clientes_masculinos / sum(c(numero_clientes_masculinos, numero_clientes_femininos))) * 100, 1)
+percentual_feminino <- round((numero_clientes_femininos / sum(c(numero_clientes_masculinos, numero_clientes_femininos))) * 100, 1)
+pie(c(numero_clientes_masculinos, numero_clientes_femininos),
+    labels = c(paste("Masculino", percentual_masculino, "%"), paste("Feminino", percentual_feminino, "%")),
+    col = c("#0080ff", "#f9638f"))  
+legend("topright", legend = c("Masculino", "Feminino"), fill = c("#0080ff", "#f9638f"))
+title(main = "Distribuição de Género dos Clientes")
+
+```
+
+```{r fig.height=5, fig.width=7}
+
+children_counts <- table(facts_dims$NumberChildrenAtHome)
+children_df <- data.frame(ChildrenCount = as.integer(names(children_counts)),
+                          Count = as.integer(children_counts))
+children_df <- children_df[order(children_df$ChildrenCount), ]
+children_df$Count <- round(children_df$Count / 1000, 1)
+ggplot(children_df, aes(x = factor(ChildrenCount), y = Count)) +
+    geom_segment(aes(x = factor(ChildrenCount), xend = factor(ChildrenCount), y = 0, yend = Count), color = "skyblue") +
+    geom_text(aes(label = Count), vjust = -1, size = 3) +  
+    labs(title = "Número de Filhos por Casa",
+         x = "Número de Filhos",
+         y = "Número (em milhares)") +
+         theme_minimal()
+```
+
+
+
+## Logistica
+
+```{r fig.height=5, fig.width=7}
+plot_bubble_chart <- function(data) {
+    soma_portes_pais <- aggregate(Freight ~ Country, data = data, sum)
+    soma_portes_pais$Country <- factor(soma_portes_pais$Country, levels = soma_portes_pais$Country[order(soma_portes_pais$Freight)])
+    soma_portes_pais$Freight <- soma_portes_pais$Freight / 1000
+
+    grafico_bolhas <- ggplot(soma_portes_pais, aes(x = Country, y = Freight, label = paste0("", format(round(Freight, 0), big.mark = ",")))) +
+        geom_point(color = "dodgerblue", alpha = 0.7) +
+        geom_text(vjust = -0.5, size = 3) +
+        labs(
+            title = "Total de Portes pagos em cada país",
+            x = "País",
+            y = "Total de Portes pagos (em milhares de dólares)",
+        ) +
+        theme_minimal() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    print(grafico_bolhas)
+}
+
+plot_bubble_chart(facts_dims)
+
+```
+```{r}
+
+```
+
+
+
+## Vendas
+
+```{r fig.height=5, fig.width=7}
+library(ggplot2)
+
+vendas_por_ano <- aggregate(SalesAmount ~ CalendarYear, data = facts_dims, sum)
+
+grafico_vendas <- ggplot(vendas_por_ano, aes(x = CalendarYear, y = SalesAmount)) +
+    geom_line(color = "blue") +
+    geom_point(color = "red", size = 3) +
+    geom_text(aes(label = paste0("", round(SalesAmount / 1000000, 2), "")), vjust = -0.5, hjust = -0.2, size = 3) +
+    labs(title = "Evolução de Vendas ao Longo dos Anos",
+         x = "Ano",
+         y = "Vendas Totais (em milhões de Dolars)") +
+    scale_y_continuous(labels = scales::dollar_format(scale = 1e-6)) +
+    theme_minimal()
+
+print(grafico_vendas)
+```
+
+
+```{r fig.height=5, fig.width=7}
+library(ggplot2)
+library(forcats)
+library(scales)
+
+sales_by_country <- aggregate(SalesAmount ~ Country, data = facts_dims, FUN = sum)
+sales_by_country <- sales_by_country[order(sales_by_country$SalesAmount, decreasing = TRUE), ]
+ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(SalesAmount)), y = SalesAmount / 1000000)) +
+    geom_segment(aes(xend = Country, yend = 0), color = "skyblue") +  
+    geom_point(color = "skyblue", size = 3) +  
+    geom_text(aes(label = paste0(scales::comma(SalesAmount / 1000000))), vjust = -1, size = 3) +
+    labs(title = "Vendas por País (2016-2019)",
+         x = "País",
+         y = "Total de Vendas (Milhões USD)") +
+    scale_y_continuous(labels = scales::comma) +  
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title = element_text(size = 10), 
+          plot.title = element_text(size = 12))
+
+
+
+```
+```{r}
+average_prices <- facts_dims %>%
+  group_by(Country) %>%
+  summarize(avg_price = mean(SalesAmount))
+average_prices <- average_prices[order(average_prices$avg_price), ]
+ggplot(average_prices, aes(x = reorder(Country, avg_price), y = avg_price)) +
+  geom_segment(aes(xend = Country, yend = 0), color = "skyblue") +
+  geom_point(size = 3, color = "#105ABD") +
+  coord_flip() +
+  labs(title = "Valor Médio de Cada Venda",  
+       x = "País",  
+       y = "Preço Médio (USD)") +
+  annotate("text", x = average_prices$Country, y = average_prices$avg_price + 5,  
+           label = round(average_prices$avg_price, 0), 
+           color = "black", size = 3, hjust = -0.2)  
+
+```
+
+```{r}
+sales_summary <- facts_dims %>%
+  group_by(ProductName) %>%
+  summarize(Num_Sales = n())
+sales_summary <- sales_summary %>%
+  arrange(desc(Num_Sales))
+top_bottom_summary <- bind_rows(
+  head(sales_summary, 5),
+  tail(sales_summary, 5)
+)
+ggplot(top_bottom_summary, aes(x = reorder(ProductName, Num_Sales), y = Num_Sales)) +
+  geom_segment(aes(xend = reorder(ProductName, Num_Sales), yend = 0), color = "#2E86C1", size = 1.5) + 
+  geom_point(color = "#E74C3C", size = 3) +  # Add points (circles)
+  geom_text(aes(label = Num_Sales), vjust = -0.5, color = "black", size = 3.5) +  
+  coord_flip() +  # Flip the coordinates to make it horizontal
+  labs(title = "Produtos Mais e Menos Vendidos",
+       x = "Producto",
+       y = "Unidades Vendidas") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))  
+```
+
+
+
+## Contabilidade
+
+```{r fig.height=5, fig.width=7}
+tax_by_country <- aggregate(TaxAmt ~ Country, data = facts_dims, FUN = sum)
+tax_by_country$TaxAmt_million <- round(tax_by_country$TaxAmt / 1000, 0)
+ggplot(tax_by_country, aes(x = "", y = TaxAmt, fill = Country, label = TaxAmt_million)) +
+    geom_bar(stat = "identity", width = 1) +
+    geom_text(aes(label = paste0(round(TaxAmt_million, 2), "")), position = position_stack(vjust = 0.5)) +
+    coord_polar(theta = "y") +
+    theme_void() +
+    theme(legend.position = "right") +
+    scale_fill_brewer(palette = "Set3") + 
+    ggtitle("Soma dos Impostos por País (em milhares de USD)") +
+    labs(y = "Tax Amount (Millions of dollars)") +  
+    scale_y_continuous(labels = comma) +  
+    theme(legend.position = "right")
+```
+
+
+
+
+
+```{r interact_barplot_marital_status, echo=FALSE, fig.height=5, fig.width=7}
+
+# gráfico de barras para a tabela de frequências para o estado civil
+
+plotly::ggplotly(gg_freq_marital_status)
+
+```
+
+blá blá
+
+<br>
+
+-   **Conclusões**
+
+blá blá
+
+# Apêndice
+
+## 1. Dicionário do *data mart*
+
+### dimensão `calendar` : df [1,279 x 11]
+
++ __ID__ : chave primária (_numeric_)
++ __Date__ : data (dd/mm/yyyy) da transacção (_date_)
++ __DayNumberOfWeek__ : dia da semana (_num_)
++ __DayName__ : nome do dia da semana (_chr_)
++ __MonthName__ : nome do mês (inglês) (_chr_)
++ __MonthNumberOfYear__ : número do mês (_num_)
++ __CalendarQuarter__: trimestre (_num_)
++ __CalendarYear__: ano (_num_)
++ __DayNumberOfYear__: número do dia do ano (_num_)
++ __DayNumberOfMonth__: número do mês (_num_)
++ __DayName__: nome do dia (_chr_)
++ __WeekNumberOfYear__: número da semana do ano (_num_)
+
+
+### dados `calendar`
+
+```{r calendar_data, echo=FALSE}
+load("calendar.Rda") # deve ser carregado no início
+DT::datatable(head(calendar, 100), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+
+
+
+### dimensão `customers`
+
+- **CustomerKey** : ID do Cliente (_num_)
+- **GeographyKey** : ID da região (_num_)
+- **Name** : Nome do Cliente (_chr_)
+- **BirthDate** : Data de Nascimento do Cliente (_date_)
+- **MaritalStatus** : Estado Civil (_chr_)
+- **Gender** : Genero (_chr_)
+- **YearlyIncome** : Rendimento Anual (_num_)
+- **NumberChildrenAtHome** : Numero de Criancas em Casa (_chr_)
+- **Occupation** : Ocupacao Profissional (_chr_)
+- **HouseOwnerFlag** : ???
+- **NumberCarsOwned** : Numero de Carros (_num_)
+- **AddressLine** : Endereco do Cliente (_chr_)
+- **Phone** : Numero de Telemovel (_num_)
+- **DateFirstPurchase** : Data da Primeira Compra (_date_)
+
+### dados `customers`
+
+```{r customers, echo=FALSE}
+load("customers.Rda") # deve ser carregado no início
+DT::datatable(head(customers, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+
+```
+
+### dimensão `Vendas`
+
+- **OrderDate**: Data da Compra (*date*)
+- **OrderDateKey**: Chave da Data da Compra (*num*)
+- **ProductKey**: Chave do Produto (*num*)
+- **CustomerKey**: Chave do Cliente (*num*)
+- **SalesTerritoryKey**: Chave do Territorio de Venda (*num*)
+- **SalesOrderNumber**: Numero da Order (*num*)
+- **SalesOrderLineNumber**: Numero de Artigos na order (*num*)
+- **OrderQuantity**: Quantidade de Artigos (*num*)
+- **UnitPrice**: Preco por Unidade (USD) (*num*)
+- **ProductStandardCost**: Custo Standard do Produto (USD) (*num*)
+- **SalesAmount**: Valor da Order (USD) (*num*)
+- **TaxAmt**: Valor do Imposto (USD) (*num*)
+- **Freight**: Custo de Envio (*num*)
+- **RegionMonthID**: ID da Regiao e do Mes (*num* and *chr*)
+
+### dados `Vendas`
+
+```{r factsSales, echo=FALSE}
+load("factSales.Rda") # deve ser carregado no início
+DT::datatable(head(factSales, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+
+```
+
+### dimensão `Products`
+
+- **ProductKey** : Chave do Produto (*num*)
+- **ProductSubcategoryKey** : Chave da Subcategoria do Producto (_num_)
+- **ProductName** : Nome do Produto (_chr_
+- **StandardCost** : Custo Standard (USD) (_num_)
+- **Color** : Cor do Produto (_chr_)
+- **SafetyStockLevel** : Stock de Seguranca (_num_)
+- **ListPrice** : Preco de Venda (USD) (*num*)
+- **Size** : Tamanho (*chr*)
+- **DaystoManufacture** : Dias Necessários para produzir (_num_)
+- **DealerPrice** : Preco de Venda ao Retalhista (USD) (*num*)
+- **Class** :
+- **ModelName** : Nome do Modelo (_chr_)
+- **Description** : Descricao (_chr_)
+- **Status** :
+- **SubCategory** : Subcategoria do Produto (_chr_)
+- **StartDate** : Data de Inicio de Venda (*date*)
+- *EndDate** : Data de Fim de Venda (*date*)
+
+###dados `Products`
+
+```{r products, echo=FALSE}
+load("products.Rda") # deve ser carregado no início
+DT::datatable(head(products, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+
+
+###dimensão `ProductCategory`
+
+- **ProductCategoryKey** : Chave da Categoria do Producto (_num_)
+- **EnglishProductCategoryName** : Categoria do Produto em Ingles (_chr_)
+- **SpanishProductCategoryName** : Categoria do Produto em Espanhol (_chr_)
+- **FrenchProductCategoryName** : Categoria do Produto em Frances (_chr_)
+
+###dados `ProductCategory`
+
+```{r productCategory, echo=FALSE}
+load("productCategory.Rda") # deve ser carregado no início
+DT::datatable(head(productCategory, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+
+### dimensão `ProductSubCategory`
+
+- **ProductCategoryKey** : Chave da Categoria do Producto (_num_)
+- **ProductSubcategoryKey** : Chave da Subcategoria do Producto (_num_)
+- **EnglishProductSubcategoryName** : SubCategoria do Produto em Ingles (_chr_)
+- **SpanishProductSubcategoryName** : SubCategoria do Produto em Espanhol (_chr_)
+- **FrenchProductSubcategoryName** : SubCategoria do Produto em Frances (_chr_)
+
+###dados `ProductSubCategory`
+
+```{r productSubcategory, echo=FALSE}
+load("productSubCategory.Rda") # deve ser carregado no início
+DT::datatable(head(productSubCategory, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+
+### dimensão `Territory`
+
+- **TerritoryKey** : Chave do Territorio (chr)
+- **Region** : Regiao (chr)
+- **Country** : Pais (chr)
+- **Group** : Continente (chr)
+
+###dados `Territory`
+
+```{r territory, echo=FALSE}
+load("territory.Rda") # deve ser carregado no início
+DT::datatable(head(territory, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
