@@ -1,0 +1,314 @@
+---
+title: "Relatório BI"
+date: "`r Sys.Date()`"
+author: 20211143, 20211139, 20211131, 20211115, 20181082
+output:
+  rmdformats::robobook:
+    code_folding: show
+    toc: 3
+    thumbnails: false
+    lightbox: true
+    gallery: false
+    cache: false
+    highlight: kate
+    fig_width: 3
+    fig_height: 2
+---
+
+```{r config, include=FALSE}
+# bibliotecas --- modificar sempre que acrescentar uma biblioteca
+bibliotecas <- c("knitr", "rmdformats", "lubridate", "ggplot2","dplyr", "DT", "gt",
+                 "flextable", "plotly", "gganimate")
+for (bibl in bibliotecas) {
+        library(bibl, character.only = TRUE)
+}
+rm(bibl, bibliotecas)
+
+# knit: opções globais --- não modificar!
+options(max.print="80")
+opts_chunk$set(echo=FALSE,
+	           cache=FALSE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=TRUE)
+opts_knit$set(width=80)
+```
+
+## Autores
+
+-   Turma: T61
+-   Grupo: G02/T61
+-   Autores
+    -   20211143 Inês Bento
+    -   20211139 Patrícia Ruivo
+    -   20211131 Miguel Morgado
+    -   20211115 Samuel Olo
+    -   20181082 Gonçalo Colaço
+
+## Introdução
+
+Os dados da empresa são relativos ao período entre 01-07-2016 e 31-07-2019. O tipo de produtos que  empresa vende, o custo dos produtos, custo de envio, os produtos mais vendidos, entre outros detalhes. 
+
+```{r data_loading, include=FALSE}
+data_files <- c("calendar.Rda", "customers.Rda", "productCategory.Rda",
+                "products.Rda", "productSubCategory.Rda", "territory.Rda",
+                "factSales.Rda", "facts_dims.Rda")
+
+for (dfiles in data_files) {
+    load(dfiles)
+    }
+rm(dfiles, data_files)
+
+```
+
+
+## Marketing
+
+```{r}
+numero_clientes_masculinos <- sum(grepl("M", facts_dims$Gender))
+numero_clientes_femininos <- sum(grepl("F", facts_dims$Gender))
+percentual_masculino <- round((numero_clientes_masculinos / sum(c(numero_clientes_masculinos, numero_clientes_femininos))) * 100, 1)
+percentual_feminino <- round((numero_clientes_femininos / sum(c(numero_clientes_masculinos, numero_clientes_femininos))) * 100, 1)
+pie(c(numero_clientes_masculinos, numero_clientes_femininos),
+    labels = c(paste("Masculino", percentual_masculino, "%"), paste("Feminino", percentual_feminino, "%")),
+    col = c("#0080ff", "#f9638f"))  
+legend("topright", legend = c("Masculino", "Feminino"), fill = c("#0080ff", "#f9638f"))
+title(main = "Distribuição de Género dos Clientes")
+   
+```
+
+
+### Perfil dos clientes
+
+Apresentam-se algumas características dos clientes ...
+
+-   **Estado Civil**
+
+```{r freq_table_marital_status, echo=FALSE}
+
+# construção do data frame de frequências para o estado civil
+tab_freq_marital_status <- customers$MaritalStatus |> 
+    table() |> 
+    prop.table() |> 
+    as.data.frame()
+names(tab_freq_marital_status) <- c("Estado_Civil", "Freq")
+
+# apresentação da tabela de frequências para o estado civil
+flextable::flextable(tab_freq_marital_status, cwidth = 1.5) |> 
+align(align = "center", part = "all")
+
+
+```
+
+<br>
+
+blá blá
+
+<br>
+
+```{r barplot_marital_status, echo=FALSE, fig.align='center'}
+
+# gráfico de barras para a tabela de frequências para o estado civil
+gg_freq_marital_status <- ggplot2::ggplot(data = tab_freq_marital_status, 
+                                            aes(x = Estado_Civil , y = Freq)) +
+                            geom_bar(stat = "identity", fill = "blue", width = 0.3) +
+                            theme_gray()
+gg_freq_marital_status
+
+```
+
+<br>
+
+blá blá
+
+<br>
+
+```{r interact_barplot_marital_status, echo=FALSE, fig.height=5, fig.width=7}
+
+# gráfico de barras para a tabela de frequências para o estado civil
+
+plotly::ggplotly(gg_freq_marital_status)
+
+```
+
+blá blá
+
+<br>
+
+-   **Conclusões**
+
+blá blá
+
+# Apêndice
+
+## 1. Dicionário do *data mart*
+
+### dimensão `calendar` : df [1,279 x 11]
+
++ __ID__ : chave primária (_numeric_)
++ __Date__ : data (dd/mm/yyyy) da transacção (_date_)
++ __DayNumberOfWeek__ : dia da semana (_num_)
++ __DayName__ : nome do dia da semana (_chr_)
++ __MonthName__ : nome do mês (inglês) (_chr_)
++ __MonthNumberOfYear__ : número do mês (_num_)
++ __CalendarQuarter__: trimestre (_num_)
++ __CalendarYear__: ano (_num_)
++ __DayNumberOfYear__: número do dia do ano (_num_)
++ __DayNumberOfMonth__: número do mês (_num_)
++ __DayName__: nome do dia (_chr_)
++ __WeekNumberOfYear__: número da semana do ano (_num_)
+
+
+### dados `calendar`
+
+```{r calendar_data, echo=FALSE}
+load("calendar.Rda") # deve ser carregado no início
+DT::datatable(head(calendar, 100), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+
+
+
+### dimensão `customers`
+ 
+- **CustomerKey** : ID do Cliente (_num_)
+- **GeographyKey** : ID da região (_num_)
+- **Name** : Nome do Cliente (_chr_)
+- **BirthDate** : Data de Nascimento do Cliente (_date_)
+- **MaritalStatus** : Estado Civil (_chr_)
+- **Gender** : Genero (_chr_)
+- **YearlyIncome** : Rendimento Anual (_num_)
+- **NumberChildrenAtHome** : Numero de Criancas em Casa (_chr_)
+- **Occupation** : Ocupacao Profissional (_chr_)
+- **HouseOwnerFlag** : ???
+- **NumberCarsOwned** : Numero de Carros (_num_)
+- **AddressLine** : Endereco do Cliente (_chr_)
+- **Phone** : Numero de Telemovel (_num_)
+- **DateFirstPurchase** : Data da Primeira Compra (_date_)
+ 
+### dados `customers`
+ 
+```{r customers, echo=FALSE}
+load("customers.Rda") # deve ser carregado no início
+DT::datatable(head(customers, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+ 
+```
+ 
+### dimensão `Vendas`
+ 
+- **OrderDate**: Data da Compra (*date*)
+- **OrderDateKey**: Chave da Data da Compra (*num*)
+- **ProductKey**: Chave do Produto (*num*)
+- **CustomerKey**: Chave do Cliente (*num*)
+- **SalesTerritoryKey**: Chave do Territorio de Venda (*num*)
+- **SalesOrderNumber**: Numero da Order (*num*)
+- **SalesOrderLineNumber**: Numero de Artigos na order (*num*)
+- **OrderQuantity**: Quantidade de Artigos (*num*)
+- **UnitPrice**: Preco por Unidade (USD) (*num*)
+- **ProductStandardCost**: Custo Standard do Produto (USD) (*num*)
+- **SalesAmount**: Valor da Order (USD) (*num*)
+- **TaxAmt**: Valor do Imposto (USD) (*num*)
+- **Freight**: Custo de Envio (*num*)
+- **RegionMonthID**: ID da Regiao e do Mes (*num* and *chr*)
+ 
+### dados `Vendas`
+ 
+```{r factsSales, echo=FALSE}
+load("factSales.Rda") # deve ser carregado no início
+DT::datatable(head(factSales, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+ 
+```
+ 
+### dimensão `Products`
+ 
+- **ProductKey** : Chave do Produto (*num*)
+- **ProductSubcategoryKey** : Chave da Subcategoria do Producto (_num_)
+- **ProductName** : Nome do Produto (_chr_
+- **StandardCost** : Custo Standard (USD) (_num_)
+- **Color** : Cor do Produto (_chr_)
+- **SafetyStockLevel** : Stock de Seguranca (_num_)
+- **ListPrice** : Preco de Venda (USD) (*num*)
+- **Size** : Tamanho (*chr*)
+- **DaystoManufacture** : Dias Necessários para produzir (_num_)
+- **DealerPrice** : Preco de Venda ao Retalhista (USD) (*num*)
+- **Class** :
+- **ModelName** : Nome do Modelo (_chr_)
+- **Description** : Descricao (_chr_)
+- **Status** :
+- **SubCategory** : Subcategoria do Produto (_chr_)
+- **StartDate** : Data de Inicio de Venda (*date*)
+- *EndDate** : Data de Fim de Venda (*date*)
+ 
+###dados `Products`
+ 
+```{r products, echo=FALSE}
+load("products.Rda") # deve ser carregado no início
+DT::datatable(head(products, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+ 
+ 
+###dimensão `ProductCategory`
+ 
+- **ProductCategoryKey** : Chave da Categoria do Producto (_num_)
+- **EnglishProductCategoryName** : Categoria do Produto em Ingles (_chr_)
+- **SpanishProductCategoryName** : Categoria do Produto em Espanhol (_chr_)
+- **FrenchProductCategoryName** : Categoria do Produto em Frances (_chr_)
+ 
+###dados `ProductCategory`
+ 
+```{r productCategory, echo=FALSE}
+load("productCategory.Rda") # deve ser carregado no início
+DT::datatable(head(productCategory, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+ 
+### dimensão `ProductSubCategory`
+ 
+- **ProductCategoryKey** : Chave da Categoria do Producto (_num_)
+- **ProductSubcategoryKey** : Chave da Subcategoria do Producto (_num_)
+- **EnglishProductSubcategoryName** : SubCategoria do Produto em Ingles (_chr_)
+- **SpanishProductSubcategoryName** : SubCategoria do Produto em Espanhol (_chr_)
+- **FrenchProductSubcategoryName** : SubCategoria do Produto em Frances (_chr_)
+ 
+###dados `ProductSubCategory`
+ 
+```{r productSubcategory, echo=FALSE}
+load("productSubCategory.Rda") # deve ser carregado no início
+DT::datatable(head(productSubCategory, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+ 
+### dimensão `Territory`
+ 
+- **TerritoryKey** : Chave do Territorio (chr)
+- **Region** : Regiao (chr)
+- **Country** : Pais (chr)
+- **Group** : Continente (chr)
+ 
+###dados `Territory`
+ 
+```{r territory, echo=FALSE}
+load("territory.Rda") # deve ser carregado no início
+DT::datatable(head(territory, 25), 
+              options = list(pageLength = 5), 
+              rownames = FALSE, 
+              class = 'cell-border stripe')
+```
+
