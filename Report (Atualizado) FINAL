@@ -273,6 +273,10 @@ ggplot(inventory_by_subcategory, aes(y = reorder(SubCategory, Unique_Products), 
     theme(axis.text.y = element_text(hjust = 0, size = 8))
 ```
 
+```
+O gráfico apresenta a distribuição da quantidade de produtos agrupados por subcategoria.
+```
+
 
 
 ## Vendas
@@ -295,6 +299,10 @@ grafico_vendas <- ggplot(vendas_por_ano, aes(x = CalendarYear, y = SalesAmount))
 print(grafico_vendas)
 ```
 
+```
+O gráfico mostra a evolução das vendas ao longo dos anos.
+```
+
 *+Evolução das vendas por trimestre**
 ```{r fig.height=5, fig.width=7}
 sales_by_year_quarter <- facts_dims %>%
@@ -309,12 +317,12 @@ ggplot(sales_by_year_quarter, aes(x = paste(CalendarYear, "Q", CalendarQuarter),
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+```
+O gráfico mostra a evolução das vendas trimestrais ao longo dos anos. Verifica-se um padrão de variação sazonal nas vendas, com alguns trimestres apresentando picos de vendas significativos. Fornece uma indicação clara do total de vendas em milhares de dólares para cada trimestre, permitindo uma análise fácil das tendências ao longo do tempo.
+```
+
 
 ```{r fig.height=5, fig.width=7}
-library(ggplot2)
-library(forcats)
-library(scales)
-
 sales_by_country <- aggregate(SalesAmount ~ Country, data = facts_dims, FUN = sum)
 sales_by_country <- sales_by_country[order(sales_by_country$SalesAmount, decreasing = TRUE), ]
 ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(SalesAmount)), y = SalesAmount / 1000000)) +
@@ -330,6 +338,11 @@ ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(SalesAmount)), y = Sa
           axis.title = element_text(size = 10), 
           plot.title = element_text(size = 12))
 ```
+
+```
+Este gráfico mostra a distribuição das vendas totais por país durante o período de 2016 a 2019. Os países estão ordenados de acordo com o total de vendas, destacando aqueles com maiores volumes de vendas. Os valores das vendas estão expressos em milhões de dólares no eixo vertical, facilitando a compreensão dos montantes. Através deste gráfico, podemos identificar os principais países em termos de contribuição para o total de vendas da empresa ao longo destes anos.
+```
+
 
 
 **Valor médio de cada venda**
@@ -351,6 +364,11 @@ ggplot(average_prices, aes(x = reorder(Country, avg_price), y = avg_price)) +
            color = "black", size = 3, hjust = -0.2)  
 
 ```
+
+```
+Este gráfico ilustra o preço médio de cada venda por país, o que permite uma comparação visual dos valores médios entre diferentes países. Encontra-se em ordem decrescente, desde o país com o maior valor médio de cada venda até ao país com menor valor.
+```
+
 
 **Os 5 produtos mais e menos vendidos da empresa**
 ```{r fig.height=5, fig.width=7}
