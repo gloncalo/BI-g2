@@ -18,7 +18,8 @@ output:
 ```{r config, include=FALSE}
 # bibliotecas --- modificar sempre que acrescentar uma biblioteca
 bibliotecas <- c("knitr", "rmdformats", "lubridate", "ggplot2","dplyr", "DT", "gt",
-                 "flextable", "plotly", "gganimate")
+                 "flextable", "plotly", "gganimate", "forcats", "scaçes") 
+
 for (bibl in bibliotecas) {
         library(bibl, character.only = TRUE)
 }
@@ -80,6 +81,8 @@ load("facts_dims.Rda")
 
 ### Perfil dos Clientes
 
+**Ocupação dos nossos clientes**
+
 ```{r fig.height=5, fig.width=7}
 occupation_counts <- table(facts_dims$Occupation)
 occupation_df <- data.frame(Occupation = names(occupation_counts),
@@ -98,7 +101,7 @@ ggplot(occupation_df, aes(x = Occupation, y = Count)) +
     theme_minimal()
 
 ```
-
+**Distribuição dos nossos clientes por género**
 ```{r fig.height=5, fig.width=7}
 numero_clientes_masculinos <- sum(grepl("M", facts_dims$Gender))
 numero_clientes_femininos <- sum(grepl("F", facts_dims$Gender))
@@ -111,7 +114,7 @@ legend("topright", legend = c("Masculino", "Feminino"), fill = c("#0080ff", "#f9
 title(main = "Distribuição de Género dos Clientes")
 
 ```
-
+**Número de filhos dos nossos clientes**
 ```{r fig.height=5, fig.width=7}
 
 children_counts <- table(facts_dims$NumberChildrenAtHome)
@@ -127,7 +130,7 @@ ggplot(children_df, aes(x = factor(ChildrenCount), y = Count)) +
          y = "Número (em milhares)") +
          theme_minimal()
 ```
-
+**Distribuição do rendimento dos nossos clientes consoante a faixa etária**
 ```{r fig.height=5, fig.width=7}
 facts_dims$BirthDate <- as.Date(facts_dims$BirthDate)
 facts_dims$Age <- as.numeric(difftime(Sys.Date(), facts_dims$BirthDate, units = "days") / 365)
@@ -169,6 +172,7 @@ ggplot(orders_counts, aes(x = factor(Num_Orders_Group), y = Num_Customers)) +
 
 ## Logistica
 
+**Gastos com envio por país**
 ```{r fig.height=5, fig.width=7}
 plot_bubble_chart <- function(data) {
     soma_portes_pais <- aggregate(Freight ~ Country, data = data, sum)
@@ -179,9 +183,9 @@ plot_bubble_chart <- function(data) {
         geom_point(color = "dodgerblue", alpha = 0.7) +
         geom_text(vjust = -0.5, size = 3) +
         labs(
-            title = "Total de Portes pagos em cada país",
+            title = "Gastos de envio em cada país",
             x = "País",
-            y = "Total de Portes pagos (em milhares de dólares)",
+            y = "Total gasto (em milhares de USD)",
         ) +
         theme_minimal() +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -191,7 +195,7 @@ plot_bubble_chart <- function(data) {
 plot_bubble_chart(facts_dims)
 
 ```
-
+**Distribuição do inventário da empresa por categoria**
 ```{r fig.height=5, fig.width=7}
 
 inventory_by_category <- facts_dims %>%
@@ -203,11 +207,11 @@ ggplot(inventory_by_category, aes(x = reorder(Category, -Unique_Products), y = U
   geom_segment(aes(xend = reorder(Category, -Unique_Products), yend = 0), color = "skyblue", size = 2) +
   geom_point(color = "blue", size = 3) +
   geom_text(aes(label = Unique_Products), vjust = -0.5, size = 3) +
-  labs(x = "Categoria", y = "Quantidade de Produtos Únicos", title = "Inventário por Categoria (Decrescente)") +
+  labs(x = "Categoria", y = "Quantidade de Produtos ", title = "Inventário por Categoria") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
-
+**Distribuição do inventário da empresa por subcategoria**
 ```{r fig.height=5, fig.width=7}
 inventory_by_subcategory <- facts_dims %>%
     group_by(SubCategory) %>%
@@ -220,7 +224,7 @@ breaks <- quantile(product_counts, probs = c(0, 1/3, 2/3, 1))
 inventory_by_subcategory$Color <- cut(product_counts, breaks = breaks, labels = colors, include.lowest = TRUE)
 ggplot(inventory_by_subcategory, aes(y = reorder(SubCategory, Unique_Products), x = Unique_Products, fill = Color)) +
     geom_bar(stat = "identity") +
-    labs(y = "Subcategoria", x = "Quantidade de Produtos Únicos", title = "Inventário por Subcategoria (Decrescente)") +
+    labs(y = "Subcategoria", x = "Quantidade de Produtos", title = "Inventário por Subcategoria") +
     scale_fill_manual(values = unique(inventory_by_subcategory$Color)) +
     theme_minimal() +
     theme(axis.text.y = element_text(hjust = 0, size = 8))
@@ -230,8 +234,8 @@ ggplot(inventory_by_subcategory, aes(y = reorder(SubCategory, Unique_Products), 
 
 ## Vendas
 
+**Evolução das vendas ao longo dos anos**
 ```{r fig.height=5, fig.width=7}
-library(ggplot2)
 
 vendas_por_ano <- aggregate(SalesAmount ~ CalendarYear, data = facts_dims, sum)
 
@@ -248,6 +252,7 @@ grafico_vendas <- ggplot(vendas_por_ano, aes(x = CalendarYear, y = SalesAmount))
 print(grafico_vendas)
 ```
 
+*+Evolução das vendas por trimestre**
 ```{r fig.height=5, fig.width=7}
 sales_by_year_quarter <- facts_dims %>%
    group_by(CalendarYear, CalendarQuarter) %>%
@@ -283,7 +288,7 @@ ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(SalesAmount)), y = Sa
           plot.title = element_text(size = 12))
 
 
-
+**Valor médio de cada venda**
 ```{r fig.height=5, fig.width=7}
 
 average_prices <- facts_dims %>%
@@ -303,6 +308,7 @@ ggplot(average_prices, aes(x = reorder(Country, avg_price), y = avg_price)) +
 
 ```
 
+**Os 5 produtos mais e menos vendidos da empresa**
 ```{r fig.height=5, fig.width=7}
 sales_summary <- facts_dims %>%
   group_by(ProductName) %>%
@@ -315,11 +321,11 @@ top_bottom_summary <- bind_rows(
 )
 ggplot(top_bottom_summary, aes(x = reorder(ProductName, Num_Sales), y = Num_Sales)) +
   geom_segment(aes(xend = reorder(ProductName, Num_Sales), yend = 0), color = "#2E86C1", size = 1.5) + 
-  geom_point(color = "#E74C3C", size = 3) +  # Add points (circles)
+  geom_point(color = "#E74C3C", size = 3) +  
   geom_text(aes(label = Num_Sales), vjust = -0.5, color = "black", size = 3.5) +  
-  coord_flip() +  # Flip the coordinates to make it horizontal
+  coord_flip() +  
   labs(title = "Produtos Mais e Menos Vendidos",
-       x = "Producto",
+       x = "Produto",
        y = "Unidades Vendidas") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))  
@@ -329,6 +335,7 @@ ggplot(top_bottom_summary, aes(x = reorder(ProductName, Num_Sales), y = Num_Sale
 
 ## Contabilidade
 
+**Total de impostos pagos em cada país**
 ```{r fig.height=5, fig.width=7}
 tax_by_country <- aggregate(TaxAmt ~ Country, data = facts_dims, FUN = sum)
 tax_by_country$TaxAmt_million <- round(tax_by_country$TaxAmt / 1000, 0)
@@ -339,14 +346,14 @@ ggplot(tax_by_country, aes(x = "", y = TaxAmt, fill = Country, label = TaxAmt_mi
     theme_void() +
     theme(legend.position = "right") +
     scale_fill_brewer(palette = "Set3") + 
-    ggtitle("Soma dos Impostos por País (em milhares de USD)") +
-    labs(y = "Tax Amount (Millions of dollars)") +  
+    ggtitle("Soma dos Impostos por País (em milhões de USD)") +
+    labs(y = "Impostos pagos (milhões de USD)") +  
     scale_y_continuous(labels = comma) +  
     theme(legend.position = "right")
 ```
 
+**Os cinco produtos que trazem mais lucro á empresa**
 ```{r fig.height=5, fig.width=7}
-
 facts_dims$Profit <- facts_dims$SalesAmount - facts_dims$ProductStandardCost
 profit_by_product <- facts_dims %>%
     group_by(ProductKey, ProductName) %>%
@@ -361,16 +368,17 @@ ggplot(top_profit_products, aes(x = reorder(ProductName, TotalProfit), y = Total
     geom_segment(aes(xend = reorder(ProductName, TotalProfit), yend = 0), color = "skyblue", size = 2) +
     geom_point(color = "blue", size = 3) +
     geom_text(aes(label = scales::dollar(TotalProfit)), vjust = -0.5, size = 3) +
-    labs(x = "Produto", y = "Lucro Total (em milhares)", title = "Cinco Produtos com Mais Lucro") +
+    labs(x = "Produto", y = "Lucro Total (em milhares de USD)", title = "Cinco Produtos com Mais Lucro") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+**Os cinco produtos que trazem menos lucro á empresa**
 ```{r fig.height=5, fig.width=7}
 ggplot(bottom_profit_products, aes(x = reorder(ProductName, TotalProfit), y = TotalProfit/1000)) +
     geom_segment(aes(xend = reorder(ProductName, TotalProfit), yend = 0), color = "salmon", size = 2) +
     geom_point(color = "red", size = 3) +
     geom_text(aes(label = scales::dollar(TotalProfit)), vjust = -0.5, size = 3) +
-    labs(x = "Produto", y = "Lucro Total (em milhares)", title = "Cinco Produtos com Menos Lucro") +
+    labs(x = "Produto", y = "Lucro Total (em milhares de USD)", title = "Cinco Produtos com Menos Lucro") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
