@@ -1,0 +1,137 @@
+---
+title: "Apresentação"
+author: "T"
+date: "`r Sys.Date()`"
+output: powerpoint_presentation
+---
+
+
+```{r config, include=FALSE}
+# bibliotecas --- modificar sempre que acrescentar uma biblioteca
+bibliotecas <- c("knitr", "lubridate", "ggplot2",
+                 "flextable")
+for (bibl in bibliotecas) {
+        library(bibl, character.only = TRUE)
+}
+rm(bibl, bibliotecas)
+
+# knit: opções globais --- não modificar!
+options(max.print="80")
+opts_chunk$set(echo=FALSE,
+	           cache=FALSE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=TRUE)
+opts_knit$set(width=80)
+
+data_files <- c("calendar.Rda", "customers.Rda", "productCategory.Rda",
+                "products.Rda", "productSubCategory.Rda","territory.Rda",
+                "factSales.Rda")
+for (dfiles in data_files) {
+    load(dfiles)
+    }
+rm(dfiles, data_files)
+
+
+facts_dims <- factSales |>
+    merge(calendar, by.x = "OrderDate", by.y = "Date") |>
+    merge(customers, by = "CustomerKey") |>
+    merge(territory, by.x = "SalesTerritoryKey", 
+          by.y = "Territory Key") |>
+    merge(products, by = "ProductKey")
+
+save(facts_dims, file = "facts_dims.Rda")
+load("facts_dims.Rda")
+```
+
+## Introdução
+
+```{r data_loading, include=FALSE}
+load("customers.Rda")
+```
+
+Neste relatório, foram analisados dados da empresa relativos ao período, entre 01-07-2016 e 31-07-2019. O tipo de produtos que empresa vende, o custo dos produtos, custo de envio, os produtos mais vendidos, entre outros parâmetros. 
+
+## Marketing: Distribuição de Ocupação dos Clientes
+
+```{r fig.height=5, fig.width=7}
+occupation_counts <- table(facts_dims$Occupation)
+occupation_df <- data.frame(Occupation = names(occupation_counts),
+                            Count = as.numeric(occupation_counts))
+occupation_df <- occupation_df[order(occupation_df$Count), ]
+occupation_df$Count <- round(occupation_df$Count / 1000, 1)
+
+ggplot(occupation_df, aes(x = Occupation, y = Count)) +
+    geom_segment(aes(x = Occupation, xend = Occupation, y = 0, yend = Count), color = "skyblue") +
+    geom_point(color = "#0080ff", size = 3) +
+    geom_text(aes(label = Count), vjust = -1.5, size = 3) +
+    coord_flip() +  
+    labs(title = "Distribuição de Ocupação dos Clientes",
+         x = "Ocupação",
+         y = "Número (em milhares)") +
+    theme_minimal()
+
+```
+
+## Logística: Total de Gastos de Envio por cada País
+
+
+```{r}
+plot_bubble_chart <- function(data) {
+    soma_portes_pais <- aggregate(Freight ~ Country, data = data, sum)
+    soma_portes_pais$Country <- factor(soma_portes_pais$Country, levels = soma_portes_pais$Country[order(soma_portes_pais$Freight)])
+    soma_portes_pais$Freight <- soma_portes_pais$Freight / 1000
+       grafico_bolhas <- ggplot(soma_portes_pais, aes(x = Country, y = Freight, label = paste0("", format(round(Freight, 0), big.mark = ",")))) +
+        geom_point(color = "dodgerblue", alpha = 0.7) +
+        geom_text(vjust = -0.5, size = 3) +
+        labs(
+            title = "Total de gastos pagos em cada país",
+            x = "País",
+            y = "Total de Portes pagos (em milhares de dólares)",
+        ) +
+        theme_minimal() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    print(grafico_bolhas)
+}
+
+plot_bubble_chart(facts_dims)
+```
+
+## Vendas: Evolução de Vendas ao Longo dos Anos
+```{r fig.height=5, fig.width=7}
+library(ggplot2)
+
+vendas_por_ano <- aggregate(SalesAmount ~ CalendarYear, data = facts_dims, sum)
+
+grafico_vendas <- ggplot(vendas_por_ano, aes(x = CalendarYear, y = SalesAmount)) +
+    geom_line(color = "blue") +
+    geom_point(color = "red", size = 3) +
+    geom_text(aes(label = paste0("", round(SalesAmount / 1000000, 2), "")), vjust = -0.5, hjust = -0.2, size = 3) +
+    labs(title = "Evolução de Vendas ao Longo dos Anos",
+         x = "Ano",
+         y = "Vendas Totais (em milhões de Dolars)") +
+    scale_y_continuous(labels = scales::dollar_format(scale = 1e-6)) +
+    theme_minimal()
+
+print(grafico_vendas)
+```
+
+## Contabilidade: Soma dos Impostos por País
+
+```{r fig.height=5, fig.width=7}
+tax_by_country <- aggregate(TaxAmt ~ Country, data = facts_dims, FUN = sum)
+tax_by_country$TaxAmt_million <- round(tax_by_country$TaxAmt / 1000, 0)
+ggplot(tax_by_country, aes(x = "", y = TaxAmt, fill = Country, label = TaxAmt_million)) +
+    geom_bar(stat = "identity", width = 1) +
+    geom_text(aes(label = paste0(round(TaxAmt_million, 2), "")), position = position_stack(vjust = 0.5)) +
+    coord_polar(theta = "y") +
+    theme_void() +
+    theme(legend.position = "right") +
+    scale_fill_brewer(palette = "Set3") + 
+    ggtitle("Soma dos Impostos por País (em milhares de USD)") +
+    labs(y = "Tax Amount (Millions of dollars)") +  
+    scale_y_continuous(labels = comma) +  
+    theme(legend.position = "right")
+```
