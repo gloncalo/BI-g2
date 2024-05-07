@@ -53,14 +53,25 @@ opts_knit$set(width=80)
 Os dados da empresa são relativos ao período entre 01-07-2016 e 31-07-2019. O tipo de produtos que  empresa vende, o custo dos produtos, custo de envio, os produtos mais vendidos, entre outros detalhes. 
 
 ```{r data_loading, include=FALSE}
-data_files <- c("calendar.Rda", "customers.Rda", "productCategory.Rda",
-                "products.Rda", "productSubCategory.Rda", "territory.Rda",
-                "factSales.Rda", "facts_dims.Rda")
 
+data_files <- c("calendar.Rda", "customers.Rda", "productCategory.Rda",
+                "products.Rda", "productSubCategory.Rda","territory.Rda",
+                "factSales.Rda")
 for (dfiles in data_files) {
     load(dfiles)
     }
 rm(dfiles, data_files)
+
+
+facts_dims <- factSales |>
+    merge(calendar, by.x = "OrderDate", by.y = "Date") |>
+    merge(customers, by = "CustomerKey") |>
+    merge(territory, by.x = "SalesTerritoryKey", 
+          by.y = "Territory Key") |>
+    merge(products, by = "ProductKey")
+
+save(facts_dims, file = "facts_dims.Rda")
+load("facts_dims.Rda")
 
 ```
 
@@ -180,8 +191,39 @@ plot_bubble_chart <- function(data) {
 plot_bubble_chart(facts_dims)
 
 ```
-```{r}
 
+```{r fig.height=5, fig.width=7}
+
+inventory_by_category <- facts_dims %>%
+  group_by(Category) %>%
+  summarise(Unique_Products = n_distinct(ProductKey))
+inventory_by_category <- inventory_by_category %>%
+  arrange(desc(Unique_Products))
+ggplot(inventory_by_category, aes(x = reorder(Category, -Unique_Products), y = Unique_Products)) +
+  geom_segment(aes(xend = reorder(Category, -Unique_Products), yend = 0), color = "skyblue", size = 2) +
+  geom_point(color = "blue", size = 3) +
+  geom_text(aes(label = Unique_Products), vjust = -0.5, size = 3) +
+  labs(x = "Categoria", y = "Quantidade de Produtos Únicos", title = "Inventário por Categoria (Decrescente)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r fig.height=5, fig.width=7}
+inventory_by_subcategory <- facts_dims %>%
+    group_by(SubCategory) %>%
+    summarise(Unique_Products = n_distinct(ProductKey))
+inventory_by_subcategory <- inventory_by_subcategory %>%
+    arrange(desc(Unique_Products))
+colors <- c("firebrick", "skyblue", "darkgreen")
+product_counts <- inventory_by_subcategory$Unique_Products
+breaks <- quantile(product_counts, probs = c(0, 1/3, 2/3, 1))
+inventory_by_subcategory$Color <- cut(product_counts, breaks = breaks, labels = colors, include.lowest = TRUE)
+ggplot(inventory_by_subcategory, aes(y = reorder(SubCategory, Unique_Products), x = Unique_Products, fill = Color)) +
+    geom_bar(stat = "identity") +
+    labs(y = "Subcategoria", x = "Quantidade de Produtos Únicos", title = "Inventário por Subcategoria (Decrescente)") +
+    scale_fill_manual(values = unique(inventory_by_subcategory$Color)) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(hjust = 0, size = 8))
 ```
 
 
@@ -204,6 +246,19 @@ grafico_vendas <- ggplot(vendas_por_ano, aes(x = CalendarYear, y = SalesAmount))
     theme_minimal()
 
 print(grafico_vendas)
+```
+
+```{r fig.height=5, fig.width=7}
+sales_by_year_quarter <- facts_dims %>%
+   group_by(CalendarYear, CalendarQuarter) %>%
+    summarise(Total_Sales = sum(SalesAmount))
+
+ggplot(sales_by_year_quarter, aes(x = paste(CalendarYear, "Q", CalendarQuarter), y = Total_Sales / 1000, group = 1)) +
+    geom_line() +
+    labs(x = "Ano e Trimestre", y = "Total de Vendas (em milhares)", title = "Evolução das Vendas de Trimestre em Trimestre") +
+    scale_y_continuous(labels = scales::comma) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 
