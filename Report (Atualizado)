@@ -117,6 +117,21 @@ ggplot(children_df, aes(x = factor(ChildrenCount), y = Count)) +
          theme_minimal()
 ```
 
+```{r fig.height=5, fig.width=7}
+facts_dims$BirthDate <- as.Date(facts_dims$BirthDate)
+facts_dims$Age <- as.numeric(difftime(Sys.Date(), facts_dims$BirthDate, units = "days") / 365)
+facts_dims$Age_Group <- cut(facts_dims$Age, breaks = seq(20, 100, by = 10),
+                            labels = paste(seq(20, 90, by = 10), seq(29, 99, by = 10), sep = "-"))
+income_by_age <- facts_dims %>%
+    group_by(Age_Group) %>%
+    summarise(Average_Income = mean(YearlyIncome, na.rm = TRUE))
+ggplot(income_by_age, aes(x = Age_Group, y = Average_Income)) +
+    geom_point() +
+    geom_text(aes(label = scales::comma(Average_Income), y = Average_Income), vjust = -0.5, size = 3) +
+    scale_y_continuous(labels = scales::comma_format(scale = 1/1000)) +
+    labs(x = "Faixa Etária", y = "Rendimento Anual Médio (em milhares)") +
+    ggtitle("Rendimento Anual Médio por Faixa Etária")
+```
 
 
 ## Logistica
