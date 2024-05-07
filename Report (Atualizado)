@@ -133,6 +133,28 @@ ggplot(income_by_age, aes(x = Age_Group, y = Average_Income)) +
     ggtitle("Rendimento Anual Médio por Faixa Etária")
 ```
 
+```{r fig.height=5, fig.width=7}
+
+orders_per_customer <- facts_dims %>%
+  group_by(CustomerKey) %>%
+  summarise(Num_Orders = n_distinct(SalesOrderNumber))
+orders_counts <- orders_per_customer %>%
+  mutate(Num_Orders_Group = case_when(
+    Num_Orders >= 4 ~ "4 ou mais",
+    TRUE ~ as.character(Num_Orders)
+  )) %>%
+  group_by(Num_Orders_Group) %>%
+  summarise(Num_Customers = n())
+ggplot(orders_counts, aes(x = factor(Num_Orders_Group), y = Num_Customers)) +
+  geom_segment(aes(xend = factor(Num_Orders_Group), yend = 0), color = "skyblue", size = 2) +
+  geom_point(color = "blue", size = 3) +
+  geom_text(aes(label = Num_Customers), vjust = -0.5, size = 3) +
+  labs(x = "Número de Encomendas por Cliente", y = "Número de Clientes") +
+  ggtitle("Número de Clientes por Número de Encomendas") +
+  theme_minimal()
+
+```
+
 
 ## Logistica
 
@@ -267,6 +289,36 @@ ggplot(tax_by_country, aes(x = "", y = TaxAmt, fill = Country, label = TaxAmt_mi
     scale_y_continuous(labels = comma) +  
     theme(legend.position = "right")
 ```
+
+```{r fig.height=5, fig.width=7}
+
+facts_dims$Profit <- facts_dims$SalesAmount - facts_dims$ProductStandardCost
+profit_by_product <- facts_dims %>%
+    group_by(ProductKey, ProductName) %>%
+    summarise(TotalProfit = sum(Profit, na.rm = TRUE))
+top_profit_products <- profit_by_product %>%
+    arrange(desc(TotalProfit)) %>%
+    head(5)
+bottom_profit_products <- profit_by_product %>%
+    arrange(TotalProfit) %>%
+    head(5)
+ggplot(top_profit_products, aes(x = reorder(ProductName, TotalProfit), y = TotalProfit/1000)) +
+    geom_segment(aes(xend = reorder(ProductName, TotalProfit), yend = 0), color = "skyblue", size = 2) +
+    geom_point(color = "blue", size = 3) +
+    geom_text(aes(label = scales::dollar(TotalProfit)), vjust = -0.5, size = 3) +
+    labs(x = "Produto", y = "Lucro Total (em milhares)", title = "Cinco Produtos com Mais Lucro") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r fig.height=5, fig.width=7}
+ggplot(bottom_profit_products, aes(x = reorder(ProductName, TotalProfit), y = TotalProfit/1000)) +
+    geom_segment(aes(xend = reorder(ProductName, TotalProfit), yend = 0), color = "salmon", size = 2) +
+    geom_point(color = "red", size = 3) +
+    geom_text(aes(label = scales::dollar(TotalProfit)), vjust = -0.5, size = 3) +
+    labs(x = "Produto", y = "Lucro Total (em milhares)", title = "Cinco Produtos com Menos Lucro") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
 
 # Apêndice
 
@@ -437,4 +489,3 @@ DT::datatable(head(territory, 25),
               options = list(pageLength = 5), 
               rownames = FALSE, 
               class = 'cell-border stripe')
-```
