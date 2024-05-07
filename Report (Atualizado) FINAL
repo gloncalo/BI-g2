@@ -102,9 +102,9 @@ ggplot(occupation_df, aes(x = Occupation, y = Count)) +
 
 ```
 
-```
+
 O gráfico mostra a distribuição das ocupações dos clientes, representando o número de clientes em cada ocupação. Observa-se que a maioria dos clientes possui ocupações profissionais, enquanto uma minoria está distribuída em ocupações manuais. A análise revela uma diversidade considerável nas ocupações dos clientes da empresa.
-```
+
 
 
 **Distribuição dos nossos clientes por género**
@@ -121,9 +121,9 @@ title(main = "Distribuição de Género dos Clientes")
 
 ```
 
-```
+
 O gráfico pie ilustra a distribuição de género dos clientes da empresa. Observa-se que a maioria dos clientes é do sexo masculino, representando aproximadamente 50.3% do total, enquanto os clientes do sexo feminino compõem cerca de 49.7%, sendo que a distribuição é quase homogéna.
-```
+
 
 
 **Número de filhos dos nossos clientes**
@@ -143,9 +143,9 @@ ggplot(children_df, aes(x = factor(ChildrenCount), y = Count)) +
          theme_minimal()
 ```
 
-```
+
 O gráfico mostra o número de filhos por casa entre os clientes da empresa. É possível verificar uma distribuição, onde a maioria dos clientes não possui filhos em casa. No entanto, uma parcela significativa possui um ou dois filhos, enquanto o número de clientes com três ou mais filhos diminui consideravelmente.
-```
+
 
 
 
@@ -166,9 +166,9 @@ ggplot(income_by_age, aes(x = Age_Group, y = Average_Income)) +
     ggtitle("Rendimento Anual Médio por Faixa Etária")
 ```
 
-```
+
 O gráfico apresenta o rendimento anual médio por faixa etária dos clientes da empresa. Nota-se que, de maneira geral, o rendimento tende a aumentar com o avanço da idade até uma certa faixa etária, após a qual começa a diminuir. Esta análise pode ajudar a empresa a entender melhor o perfil económico dos seus clientes em diferentes faixas etárias.
-```
+
 
 **Número de encomendas por cliente**
 ```{r fig.height=5, fig.width=7}
@@ -193,9 +193,9 @@ ggplot(orders_counts, aes(x = factor(Num_Orders_Group), y = Num_Customers)) +
 
 ```
 
-```
+
 O gráfico mostra o número de clientes agrupados pelo número de encomendas que realizaram. A maioria dos clientes fez menos de 4 encomendas, com uma diminuição no número de clientes à medida que o número de encomendas aumenta. Isto pode indicar uma oportunidade de aumentar a fidelidade dos clientes que fazem menos encomendas, por meio de programas de fidelidade ou ofertas especiais.
-```
+
 
 
 ## Logistica
@@ -226,9 +226,9 @@ plot_bubble_chart(facts_dims)
 
 ```
 
-```
+
 O gráfico ilustra o valor total de gastos com envio em cada país, destacando as discrepâncias nos custos de envio entre diferentes regiões. Países com valores mais elevados aparecem visualmente mais destacados, enquanto aqueles com custos menores são representados por pontos menores. Essa representação visual facilita a identificação dos países que mais contribuem para os custos totais de envio.
-```
+
 
 
 
@@ -249,9 +249,9 @@ ggplot(inventory_by_category, aes(x = reorder(Category, -Unique_Products), y = U
 
 ```
 
-```
+
 O gráfico mostra a quantidade de produtos agrupados por categoria.
-```
+
 
 
 **Distribuição do inventário da empresa por subcategoria**
@@ -273,9 +273,9 @@ ggplot(inventory_by_subcategory, aes(y = reorder(SubCategory, Unique_Products), 
     theme(axis.text.y = element_text(hjust = 0, size = 8))
 ```
 
-```
+
 O gráfico apresenta a distribuição da quantidade de produtos agrupados por subcategoria.
-```
+
 
 
 
@@ -317,9 +317,9 @@ ggplot(sales_by_year_quarter, aes(x = paste(CalendarYear, "Q", CalendarQuarter),
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-```
+
 O gráfico mostra a evolução das vendas trimestrais ao longo dos anos. Verifica-se um padrão de variação sazonal nas vendas, com alguns trimestres apresentando picos de vendas significativos. Fornece uma indicação clara do total de vendas em milhares de dólares para cada trimestre, permitindo uma análise fácil das tendências ao longo do tempo.
-```
+
 
 
 ```{r fig.height=5, fig.width=7}
@@ -339,9 +339,9 @@ ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(SalesAmount)), y = Sa
           plot.title = element_text(size = 12))
 ```
 
-```
+
 Este gráfico mostra a distribuição das vendas totais por país durante o período de 2016 a 2019. Os países estão ordenados de acordo com o total de vendas, destacando aqueles com maiores volumes de vendas. Os valores das vendas estão expressos em milhões de dólares no eixo vertical, facilitando a compreensão dos montantes. Através deste gráfico, podemos identificar os principais países em termos de contribuição para o total de vendas da empresa ao longo destes anos.
-```
+
 
 
 
@@ -365,9 +365,9 @@ ggplot(average_prices, aes(x = reorder(Country, avg_price), y = avg_price)) +
 
 ```
 
-```
+
 Este gráfico ilustra o preço médio de cada venda por país, o que permite uma comparação visual dos valores médios entre diferentes países. Encontra-se em ordem decrescente, desde o país com o maior valor médio de cada venda até ao país com menor valor.
-```
+
 
 
 **Os 5 produtos mais e menos vendidos da empresa**
@@ -393,6 +393,8 @@ ggplot(top_bottom_summary, aes(x = reorder(ProductName, Num_Sales), y = Num_Sale
   theme(plot.title = element_text(hjust = 0.5))  
 ```
 
+Este gráfico apresenta uma análise dos produtos mais e menos vendidos. Estes encontram-se ordenados com base no número de unidades vendidas, sendo o produto mais vendido "Water Bottle" e o menos vendido "Mountain-100 Silver,48". Fornecendo uma visão clara da distribuição das vendas entre os diferentes produtos.
+
 
 
 ## Contabilidade
@@ -414,6 +416,12 @@ ggplot(tax_by_country, aes(x = "", y = TaxAmt, fill = Country, label = TaxAmt_mi
     theme(legend.position = "right")
 ```
 
+
+Este gráfico apresenta a soma dos impostos por país em milhões de dólares. Cada cor do gráfico representa um país, sendo o tamanho proporcional ao montante total de impostos pagos. A sua visualização oferece uma visão geral da contribuição de cada país para os impostos totais, destacando aqueles que contribuem com as maiores e menores quantidades.
+
+
+
+
 **Os cinco produtos que trazem mais lucro á empresa**
 ```{r fig.height=5, fig.width=7}
 facts_dims$Profit <- facts_dims$SalesAmount - facts_dims$ProductStandardCost
@@ -434,6 +442,10 @@ ggplot(top_profit_products, aes(x = reorder(ProductName, TotalProfit), y = Total
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+Este gráfico mostra os cinco produtos com o maior lucro total. Os produtos estão ordenados do menor para o maior lucro. Esta visualização permite identificar rapidamente quais produtos contribuem mais para o lucro geral da empresa, fornecendo insights valiosos para tomadas de decisão estratégicas.
+
+
+
 **Os cinco produtos que trazem menos lucro á empresa**
 ```{r fig.height=5, fig.width=7}
 ggplot(bottom_profit_products, aes(x = reorder(ProductName, TotalProfit), y = TotalProfit/1000)) +
@@ -443,6 +455,8 @@ ggplot(bottom_profit_products, aes(x = reorder(ProductName, TotalProfit), y = To
     labs(x = "Produto", y = "Lucro Total (em milhares de USD)", title = "Cinco Produtos com Menos Lucro") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+Esse gráfico apresenta os cinco produtos com o menor lucro total. Os produtos estão ordenados do menor para o maior lucro. A sua análise ajuda a identificar quais produtos contribuem menos para o lucro global da empresa, fornecendo insights importantes para possíveis ajustes.
 
 
 # Apêndice
