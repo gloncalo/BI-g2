@@ -51,7 +51,7 @@ opts_knit$set(width=80)
 
 ## Introdução
 
-Os dados da empresa são relativos ao período entre 01-07-2016 e 31-07-2019. O tipo de produtos que  empresa vende, o custo dos produtos, custo de envio, os produtos mais vendidos, entre outros detalhes. 
+Neste relatório, foram analisados dados da empresa relativos ao período, entre 01-07-2016 e 31-07-2019. O tipo de produtos que empresa vende, o custo dos produtos, custo de envio, os produtos mais vendidos, entre outros parâmetros. 
 
 ```{r data_loading, include=FALSE}
 
