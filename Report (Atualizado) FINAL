@@ -284,8 +284,8 @@ ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(SalesAmount)), y = Sa
 
 
 
-```
-```{r}
+```{r fig.height=5, fig.width=7}
+
 average_prices <- facts_dims %>%
   group_by(Country) %>%
   summarize(avg_price = mean(SalesAmount))
@@ -303,7 +303,7 @@ ggplot(average_prices, aes(x = reorder(Country, avg_price), y = avg_price)) +
 
 ```
 
-```{r}
+```{r fig.height=5, fig.width=7}
 sales_summary <- facts_dims %>%
   group_by(ProductName) %>%
   summarize(Num_Sales = n())
