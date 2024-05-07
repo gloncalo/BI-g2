@@ -79,7 +79,7 @@ load("facts_dims.Rda")
 
 ## Marketing
 
-### Perfil dos Clientes
+### Ocupação dos nossos clientes
 
 **Ocupação dos nossos clientes**
 
@@ -101,6 +101,12 @@ ggplot(occupation_df, aes(x = Occupation, y = Count)) +
     theme_minimal()
 
 ```
+
+```
+O gráfico mostra a distribuição das ocupações dos clientes, representando o número de clientes em cada ocupação. Observa-se que a maioria dos clientes possui ocupações profissionais, enquanto uma minoria está distribuída em ocupações manuais. A análise revela uma diversidade considerável nas ocupações dos clientes da empresa.
+```
+
+
 **Distribuição dos nossos clientes por género**
 ```{r fig.height=5, fig.width=7}
 numero_clientes_masculinos <- sum(grepl("M", facts_dims$Gender))
@@ -114,6 +120,12 @@ legend("topright", legend = c("Masculino", "Feminino"), fill = c("#0080ff", "#f9
 title(main = "Distribuição de Género dos Clientes")
 
 ```
+
+```
+O gráfico pie ilustra a distribuição de género dos clientes da empresa. Observa-se que a maioria dos clientes é do sexo masculino, representando aproximadamente 50.3% do total, enquanto os clientes do sexo feminino compõem cerca de 49.7%, sendo que a distribuição é quase homogéna.
+```
+
+
 **Número de filhos dos nossos clientes**
 ```{r fig.height=5, fig.width=7}
 
@@ -130,6 +142,13 @@ ggplot(children_df, aes(x = factor(ChildrenCount), y = Count)) +
          y = "Número (em milhares)") +
          theme_minimal()
 ```
+
+```
+O gráfico mostra o número de filhos por casa entre os clientes da empresa. É possível verificar uma distribuição, onde a maioria dos clientes não possui filhos em casa. No entanto, uma parcela significativa possui um ou dois filhos, enquanto o número de clientes com três ou mais filhos diminui consideravelmente.
+```
+
+
+
 **Distribuição do rendimento dos nossos clientes consoante a faixa etária**
 ```{r fig.height=5, fig.width=7}
 facts_dims$BirthDate <- as.Date(facts_dims$BirthDate)
@@ -147,6 +166,11 @@ ggplot(income_by_age, aes(x = Age_Group, y = Average_Income)) +
     ggtitle("Rendimento Anual Médio por Faixa Etária")
 ```
 
+```
+O gráfico apresenta o rendimento anual médio por faixa etária dos clientes da empresa. Nota-se que, de maneira geral, o rendimento tende a aumentar com o avanço da idade até uma certa faixa etária, após a qual começa a diminuir. Esta análise pode ajudar a empresa a entender melhor o perfil económico dos seus clientes em diferentes faixas etárias.
+```
+
+**Número de encomendas por cliente**
 ```{r fig.height=5, fig.width=7}
 
 orders_per_customer <- facts_dims %>%
@@ -169,8 +193,14 @@ ggplot(orders_counts, aes(x = factor(Num_Orders_Group), y = Num_Customers)) +
 
 ```
 
+```
+O gráfico mostra o número de clientes agrupados pelo número de encomendas que realizaram. A maioria dos clientes fez menos de 4 encomendas, com uma diminuição no número de clientes à medida que o número de encomendas aumenta. Isto pode indicar uma oportunidade de aumentar a fidelidade dos clientes que fazem menos encomendas, por meio de programas de fidelidade ou ofertas especiais.
+```
+
 
 ## Logistica
+
+###Gastos de envio por país
 
 **Gastos com envio por país**
 ```{r fig.height=5, fig.width=7}
@@ -195,6 +225,13 @@ plot_bubble_chart <- function(data) {
 plot_bubble_chart(facts_dims)
 
 ```
+
+```
+O gráfico ilustra o valor total de gastos com envio em cada país, destacando as discrepâncias nos custos de envio entre diferentes regiões. Países com valores mais elevados aparecem visualmente mais destacados, enquanto aqueles com custos menores são representados por pontos menores. Essa representação visual facilita a identificação dos países que mais contribuem para os custos totais de envio.
+```
+
+
+
 **Distribuição do inventário da empresa por categoria**
 ```{r fig.height=5, fig.width=7}
 
@@ -211,6 +248,12 @@ ggplot(inventory_by_category, aes(x = reorder(Category, -Unique_Products), y = U
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
+```
+O gráfico mostra a quantidade de produtos agrupados por categoria.
+```
+
+
 **Distribuição do inventário da empresa por subcategoria**
 ```{r fig.height=5, fig.width=7}
 inventory_by_subcategory <- facts_dims %>%
@@ -286,6 +329,7 @@ ggplot(sales_by_country, aes(x = fct_reorder(Country, desc(SalesAmount)), y = Sa
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
           axis.title = element_text(size = 10), 
           plot.title = element_text(size = 12))
+```
 
 
 **Valor médio de cada venda**
