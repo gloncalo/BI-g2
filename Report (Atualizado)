@@ -268,26 +268,6 @@ ggplot(tax_by_country, aes(x = "", y = TaxAmt, fill = Country, label = TaxAmt_mi
     theme(legend.position = "right")
 ```
 
-
-
-
-
-```{r interact_barplot_marital_status, echo=FALSE, fig.height=5, fig.width=7}
-
-# gráfico de barras para a tabela de frequências para o estado civil
-
-plotly::ggplotly(gg_freq_marital_status)
-
-```
-
-blá blá
-
-<br>
-
--   **Conclusões**
-
-blá blá
-
 # Apêndice
 
 ## 1. Dicionário do *data mart*
